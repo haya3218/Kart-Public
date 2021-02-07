@@ -827,6 +827,9 @@ static INT32 K_KartGetItemOdds(UINT8 pos, SINT8 item, fixed_t mashed, boolean sp
 			}
 		}
 	}
+	// courtesy of fickle from 1.1 battleroyale
+	// battleroyale: limit how much items will scale to try to prevent shit-tier items in shit-huge netames
+	pingame = min(pingame, 14);
 
 	if (first != -1 && second != -1) // calculate 2nd's distance from 1st, for SPB
 	{
