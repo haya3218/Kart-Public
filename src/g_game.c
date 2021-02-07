@@ -520,7 +520,7 @@ consvar_t cv_driftaxis4 = {"joyaxis4_drift", "Z-Rudder", CV_SAVE, joyaxis_cons_t
 consvar_t cv_deadzone4 = {"joy4_deadzone", "0.5", CV_FLOAT|CV_SAVE, deadzone_cons_t, NULL, 0, NULL, NULL, 0, 0, NULL};
 
 
-#if MAXPLAYERS > 16
+#if MAXPLAYERS > 32
 #error "please update player_name table using the new value for MAXPLAYERS"
 #endif
 
@@ -545,7 +545,23 @@ char player_names[MAXPLAYERS][MAXPLAYERNAME+1] =
 	"Player 13",
 	"Player 14",
 	"Player 15",
-	"Player 16"
+	"Player 16",
+	"Player 17",
+	"Player 18",
+	"Player 19",
+	"Player 20",
+	"Player 21",
+	"Player 22",
+	"Player 23",
+	"Player 24",
+	"Player 25",
+	"Player 26",
+	"Player 27",
+	"Player 28",
+	"Player 29",
+	"Player 30",
+	"Player 31",
+	"Player 32"
 }; // SRB2kart - removed Players 17 through 32
 
 INT32 player_name_changes[MAXPLAYERS];
