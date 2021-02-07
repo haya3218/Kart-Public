@@ -7618,12 +7618,16 @@ void HU_DrawTabRankings(INT32 x, INT32 y, playersort_t *tab, INT32 scorelines, I
 	//this function is designed for 9 or less score lines only
 	//I_Assert(scorelines <= 9); -- not today bitch, kart fixed it up
 
+
+	//battleroyale: these adjustments to show more players courtesy of fickle from v1.1 battleroyale
 	V_DrawFill(1-duptweak, 26, dupadjust-2, 1, 0); // Draw a horizontal line because it looks nice!
 	if (scorelines > 8)
 	{
-		V_DrawFill(160, 26, 1, 147, 0); // Draw a vertical line to separate the two sides.
+		V_DrawFill(105, 26, 1, 147, 0); // Draw a vertical line to separate the two sides.
+		V_DrawFill(211, 26, 1, 147, 0); // Draw a vertical line to separate the two sides.
 		V_DrawFill(1-duptweak, 173, dupadjust-2, 1, 0); // And a horizontal line near the bottom.
-		rightoffset = (BASEVIDWIDTH/2) - 4 - x;
+		rightoffset = (BASEVIDWIDTH/3) - 4 - x;
+		x += 2;
 	}
 
 	for (i = 0; i < scorelines; i++)
@@ -7640,7 +7644,7 @@ void HU_DrawTabRankings(INT32 x, INT32 y, playersort_t *tab, INT32 scorelines, I
 		STRBUFCPY(strtime, tab[i].name);
 
 		if (scorelines > 8)
-			V_DrawThinString(x + 20, y, ((tab[i].num == whiteplayer) ? hilicol : 0)|V_ALLOWLOWERCASE|V_6WIDTHSPACE, strtime);
+			V_DrawThinString(x + 12, y, ((tab[i].num == whiteplayer) ? hilicol : 0)|V_ALLOWLOWERCASE|V_6WIDTHSPACE, strtime);
 		else
 			V_DrawString(x + 20, y, ((tab[i].num == whiteplayer) ? hilicol : 0)|V_ALLOWLOWERCASE, strtime);
 
@@ -7651,8 +7655,11 @@ void HU_DrawTabRankings(INT32 x, INT32 y, playersort_t *tab, INT32 scorelines, I
 				colormap = R_GetTranslationColormap(TC_RAINBOW, players[tab[i].num].mo->color, GTC_CACHE);
 			else
 				colormap = R_GetTranslationColormap(players[tab[i].num].skin, players[tab[i].num].mo->color, GTC_CACHE);
-
-			V_DrawMappedPatch(x, y-4, 0, facerankprefix[players[tab[i].num].skin], colormap);
+			
+			if (scorelines > 8)
+				V_DrawFixedPatch((x+1)<<FRACBITS, (y+1)<<FRACBITS, FRACUNIT/2, 0, facerankprefix[players[tab[i].num].skin], colormap);
+			else
+				V_DrawMappedPatch(x, y-4, 0, facerankprefix[players[tab[i].num].skin], colormap);
 			/*if (G_BattleGametype() && players[tab[i].num].kartstuff[k_bumper] > 0) -- not enough space for this
 			{
 				INT32 bumperx = x+19;
@@ -7665,7 +7672,7 @@ void HU_DrawTabRankings(INT32 x, INT32 y, playersort_t *tab, INT32 scorelines, I
 			}*/
 		}
 
-		if (tab[i].num == whiteplayer)
+		if (scorelines <= 8 && tab[i].num == whiteplayer)
 			V_DrawScaledPatch(x, y-4, 0, kp_facehighlight[(leveltime / 4) % 8]);
 
 		if (G_BattleGametype() && players[tab[i].num].kartstuff[k_bumper] <= 0)
@@ -7673,10 +7680,15 @@ void HU_DrawTabRankings(INT32 x, INT32 y, playersort_t *tab, INT32 scorelines, I
 		else
 		{
 			INT32 pos = players[tab[i].num].kartstuff[k_position];
-			if (pos < 0 || pos > MAXPLAYERS)
-				pos = 0;
+			if (scorelines > 8)
+				V_DrawPingNum(x, y+2, 0, pos, NULL);
+			else if (pos < 0 || pos > 16)
+				V_DrawPingNum(x, y+6, 0, pos, NULL);
+			//if (pos < 0 || pos > MAXPLAYERS)
+				//pos = 0;
 			// Draws the little number over the face
-			V_DrawScaledPatch(x-5, y+6, 0, kp_facenum[pos]);
+			else
+				V_DrawScaledPatch(x-5, y+6, 0, kp_facenum[pos]);
 		}
 
 		if (G_RaceGametype())
@@ -7705,12 +7717,18 @@ void HU_DrawTabRankings(INT32 x, INT32 y, playersort_t *tab, INT32 scorelines, I
 		else
 			V_DrawRightAlignedString(x+rightoffset, y, 0, va("%u", tab[i].count));
 
-		y += 18;
+		y += (scorelines > 8) ? 10 : 18;
+		if (i == 13 || i == 27)
+		{
+			y = 29;
+			x += (BASEVIDWIDTH/3);
+		}
+/*		y += 18;
 		if (i == 7)
 		{
 			y = 33;
 			x = (BASEVIDWIDTH/2) + 4;
-		}
+		}*/
 	}
 }
 
