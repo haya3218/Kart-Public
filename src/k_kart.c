@@ -7593,12 +7593,15 @@ static boolean K_drawKartPositionFaces(void)
 			V_DrawScaledPatch(FACE_X-4, Y-3, V_HUDTRANS|V_SNAPTOLEFT, kp_ranknobumpers);
 		else
 		{
+			//fix to ranking icons only having 16 ranks courtesy of fickle from v1.1 battleroyale
 			INT32 pos = players[rankplayer[i]].kartstuff[k_position];
-			if (pos < 0 || pos > MAXPLAYERS)
-				pos = 0;
-			// Draws the little number over the face
-			V_DrawScaledPatch(FACE_X-5, Y+10, V_HUDTRANS|V_SNAPTOLEFT, kp_facenum[pos]);
+			if (pos < 0 || pos > 16)
+				V_DrawPingNum(FACE_X+2, Y+10, V_HUDTRANS|V_SNAPTOLEFT, pos, NULL);
+			else
+				// Draws the little number over the face
+				V_DrawScaledPatch(FACE_X-5, Y+10, V_HUDTRANS|V_SNAPTOLEFT, kp_facenum[pos]);
 		}
+
 
 		Y += 18;
 	}
@@ -7636,7 +7639,7 @@ void HU_DrawTabRankings(INT32 x, INT32 y, playersort_t *tab, INT32 scorelines, I
 
 		if (players[tab[i].num].spectator || !players[tab[i].num].mo)
 			continue; //ignore them.
-
+/*
 		if (netgame // don't draw it offline
 		&& tab[i].num != serverplayer)
 			HU_drawPing(x + ((i < 8) ? -17 : rightoffset + 11), y-4, playerpingtable[tab[i].num], 0);
@@ -7647,7 +7650,7 @@ void HU_DrawTabRankings(INT32 x, INT32 y, playersort_t *tab, INT32 scorelines, I
 			V_DrawThinString(x + 12, y, ((tab[i].num == whiteplayer) ? hilicol : 0)|V_ALLOWLOWERCASE|V_6WIDTHSPACE, strtime);
 		else
 			V_DrawString(x + 20, y, ((tab[i].num == whiteplayer) ? hilicol : 0)|V_ALLOWLOWERCASE, strtime);
-
+*/
 		if (players[tab[i].num].mo->color)
 		{
 			colormap = R_GetTranslationColormap(players[tab[i].num].skin, players[tab[i].num].mo->color, GTC_CACHE);
