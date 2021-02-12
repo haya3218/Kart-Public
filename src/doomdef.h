@@ -147,8 +147,8 @@ extern char  logfilename[1024];
 // most interface strings are ignored in development mode.
 // we use comprevision and compbranch instead.
 #else
-#define VERSION    0 // Game version
-#define SUBVERSION 2 // more precise version number
+#define VERSION    1 // Game version
+#define SUBVERSION 3 // more precise version number
 #define VERSIONSTRING "v1.3 MPI v0.2"
 #define VERSIONSTRINGW L"v1.3 MPI v0.2"
 // Hey! If you change this, add 1 to the MODVERSION below! Otherwise we can't force updates!
