@@ -685,6 +685,15 @@ typedef struct
 #pragma pack()
 #endif
 
+// rotsprite
+#ifdef ROTSPRITE
+typedef struct
+{
+	patch_t *patch[16][ROTANGLES];
+	UINT16 cached;
+} rotsprite_t;
+#endif/*ROTSPRITE*/
+
 typedef enum
 {
 	SRF_SINGLE      = 0,   // 0-angle for all rotations
@@ -721,6 +730,10 @@ typedef struct
 
 	// Flip bits (1 = flip) to use for view angles 0-7.
 	UINT8 flip;
+
+#ifdef ROTSPRITE
+	rotsprite_t rotsprite;
+#endif
 } spriteframe_t;
 
 //

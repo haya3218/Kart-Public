@@ -33,6 +33,7 @@ enum mobj_e {
 	mobj_snext,
 	mobj_sprev,
 	mobj_angle,
+	mobj_rollangle,
 	mobj_sprite,
 	mobj_frame,
 	mobj_anim_duration,
@@ -94,6 +95,7 @@ static const char *const mobj_opt[] = {
 	"snext",
 	"sprev",
 	"angle",
+	"rollangle",
 	"sprite",
 	"frame",
 	"anim_duration",
@@ -187,6 +189,9 @@ static int mobj_get(lua_State *L)
 		return UNIMPLEMENTED;
 	case mobj_angle:
 		lua_pushangle(L, mo->angle);
+		break;
+	case mobj_rollangle:
+		lua_pushangle(L, mo->rollangle);
 		break;
 	case mobj_sprite:
 		lua_pushinteger(L, mo->sprite);
@@ -422,6 +427,9 @@ static int mobj_set(lua_State *L)
 			localangle[2] = mo->angle;
 		else if (mo->player == &players[displayplayers[3]])
 			localangle[3] = mo->angle;
+		break;
+	case mobj_rollangle:
+		mo->rollangle = luaL_checkangle(L, 3);
 		break;
 	case mobj_sprite:
 		mo->sprite = luaL_checkinteger(L, 3);

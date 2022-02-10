@@ -114,26 +114,7 @@ typedef struct
 	poly_t *planepoly;  // the generated convex polygon
 } extrasubsector_t;
 
-// needed for sprite rendering
-// equivalent of the software renderer's vissprites
-typedef struct gr_vissprite_s
-{
-	// Doubly linked list
-	struct gr_vissprite_s *prev;
-	struct gr_vissprite_s *next;
-	float x1, x2;
-	float z1, z2;
-	float tz, ty;
-	lumpnum_t patchlumpnum;
-	boolean flip;
-	UINT8 translucency;       //alpha level 0-255
-	mobj_t *mobj;
-	boolean precip; // Tails 08-25-2002
-	boolean vflip;
-   //Hurdler: 25/04/2000: now support colormap in hardware mode
-	UINT8 *colormap;
-	INT32 dispoffset; // copy of info->dispoffset, affects ordering but not drawing
-} gr_vissprite_t;
+//here lies gr_vissprite
 
 // Kart features
 #define USE_FTRANSFORM_ANGLEZ

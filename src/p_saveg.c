@@ -955,8 +955,9 @@ typedef enum
 	MD2_HNEXT       = 1<<7,
 	MD2_HPREV       = 1<<8,
 	MD2_COLORIZED	= 1<<9,
-	MD2_WAYPOINTCAP	= 1<<10
-	, MD2_SLOPE       = 1<<11
+	MD2_WAYPOINTCAP	= 1<<10, 
+	MD2_SLOPE       = 1<<11,
+	MD2_ROLLANGLE   = 1<<12
 } mobj_diff2_t;
 
 typedef enum
@@ -1149,6 +1150,8 @@ static void SaveMobjThinker(const thinker_t *th, const UINT8 type)
 		diff2 |= MD2_SLOPE;
 	if (mobj->colorized)
 		diff2 |= MD2_COLORIZED;
+	if (mobj->rollangle)
+		diff2 |= MD2_ROLLANGLE;
 	if (mobj == waypointcap)
 		diff2 |= MD2_WAYPOINTCAP;
 	if (diff2 != 0)
@@ -1270,6 +1273,8 @@ static void SaveMobjThinker(const thinker_t *th, const UINT8 type)
 		WRITEUINT16(save_p, mobj->standingslope->id);
 	if (diff2 & MD2_COLORIZED)
 		WRITEUINT8(save_p, mobj->colorized);
+	if (diff2 & MD2_ROLLANGLE)
+		WRITEANGLE(save_p, mobj->rollangle);
 
 	WRITEUINT32(save_p, mobj->mobjnum);
 }
@@ -2141,6 +2146,8 @@ static void LoadMobjThinker(actionf_p1 thinker)
 		mobj->standingslope = P_SlopeById(READUINT16(save_p));
 	if (diff2 & MD2_COLORIZED)
 		mobj->colorized = READUINT8(save_p);
+	if (diff2 & MD2_ROLLANGLE)
+		mobj->rollangle = READANGLE(save_p);
 
 	if (diff & MD_REDFLAG)
 	{

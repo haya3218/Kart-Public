@@ -16,6 +16,7 @@
 
 #include "sounds.h"
 #include "r_plane.h"
+#include "r_patch.h"
 
 // "Left" and "Right" character symbols for additional rotation functionality
 #define ROT_L ('L' - '0')
@@ -28,6 +29,8 @@
 #define VISSPRITECHUNKBITS 6	// 2^6 = 64 sprites per chunk
 #define VISSPRITESPERCHUNK (1 << VISSPRITECHUNKBITS)
 #define VISSPRITEINDEXMASK (VISSPRITESPERCHUNK - 1)
+
+#define FEETADJUST (4<<FRACBITS) // R_AddSingleSpriteDef
 
 // Constant arrays used for psprite clipping
 //  and initializing clipping.
@@ -130,7 +133,7 @@ typedef struct vissprite_s
 	fixed_t xiscale; // negative if flipped
 
 	fixed_t texturemid;
-	lumpnum_t patch;
+	patch_t *patch;
 
 	lighttable_t *colormap; // for color translation and shadow draw
 	                        // maxbright frames as well

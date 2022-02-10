@@ -285,6 +285,7 @@ typedef struct mobj_s
 	angle_t angle;  // orientation
 	angle_t old_angle; // orientation interpolation
 	angle_t old_angle2;
+	angle_t rollangle;
 	spritenum_t sprite; // used to find patch_t and flip value
 	UINT32 frame; // frame number, plus bits see p_pspr.h
 	UINT16 anim_duration; // for FF_ANIMATE states
@@ -407,6 +408,7 @@ typedef struct precipmobj_s
 	angle_t angle;  // orientation
 	angle_t old_angle; // orientation interpolation
 	angle_t old_angle2;
+	angle_t rollangle;
 	spritenum_t sprite; // used to find patch_t and flip value
 	UINT32 frame; // frame number, plus bits see p_pspr.h
 	UINT16 anim_duration; // for FF_ANIMATE states
