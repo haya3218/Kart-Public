@@ -9701,7 +9701,7 @@ static void M_DrawSetupMultiPlayerMenu(void)
 			barlen = dy;
 		barpos = barlen * setupm_skinydrag;
 
-		if (setupm_skinypos >= listlen - SKINGRIDHEIGHT)
+		if (setupm_skinydrag >= listlen - SKINGRIDHEIGHT)
 			barlen = dy - barpos;
 
 		V_DrawFill(x, y + barpos, scrx, barlen, 234);
@@ -9723,7 +9723,7 @@ static void M_DrawSetupMultiPlayerMenu(void)
 		case SKINMENUTYPE_GRID:
 			//tw = V_StringWidth("Character", 0);//V_StringWidth(GETSELECTEDSKINNAME, 0);
 			st = V_StringWidth(skins[skintodisplay].realname, 0);
-			V_DrawString(mx + 54 + (72/2), my+65+76,
+			V_DrawString(mx + (72/2) - 30, my+65+70,
 				((MP_PlayerSetupMenu[2].status & IT_TYPE) == IT_SPACE ? V_TRANSLUCENT : 0) | highlightflags | V_ALLOWLOWERCASE,
 				skins[skintodisplay].realname);
 			break;
@@ -10158,8 +10158,10 @@ static void M_DrawSetupMultiPlayerMenu(void)
 	}
 	patch = W_CachePatchNum(sprframe->lumppat[speenframe], PU_CACHE);
 
+	INT32 charoffsety = (cv_skinselectmenu.value == SKINMENUTYPE_GRID ? 45 : 65);
+
 	// draw box around guy
-	V_DrawFill(mx + 43 - (charw/2), my+65, charw, 84, 239);
+	V_DrawFill(mx + 43 - (charw/2), my+charoffsety, charw, 84, 239);
 
 	// draw player sprite
 	if (setupm_fakecolor) // inverse should never happen
@@ -10169,12 +10171,12 @@ static void M_DrawSetupMultiPlayerMenu(void)
 		if (skins[skintodisplay].flags & SF_HIRES)
 		{
 			V_DrawFixedPatch((mx+43)<<FRACBITS,
-						(my+131)<<FRACBITS,
+						(my+charoffsety+66)<<FRACBITS,
 				skins[skintodisplay].highresscale,
 				flags, patch, colormap);
 		}
 		else
-			V_DrawMappedPatch(mx+43, my+131, flags, patch, colormap);
+			V_DrawMappedPatch(mx+43, my+charoffsety+66, flags, patch, colormap);
 	}
 #undef charw
 }
