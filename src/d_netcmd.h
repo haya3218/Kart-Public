@@ -148,7 +148,11 @@ extern consvar_t cv_specialrings, cv_powerstones, cv_matchboxes, cv_competitionb
 extern consvar_t cv_maxping;
 extern consvar_t cv_pingtimeout;
 extern consvar_t cv_showping;
+<<<<<<< HEAD
 extern consvar_t cv_pingmeasurement;
+=======
+extern consvar_t cv_showviewpointtext;
+>>>>>>> d677981531a95fbdc837662895757d19e6ba2e03
 
 extern consvar_t cv_skipmapcheck;
 
