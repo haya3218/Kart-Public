@@ -155,6 +155,9 @@ extern consvar_t cv_skipmapcheck;
 
 extern consvar_t cv_sleep;
 
+extern consvar_t cv_lessbattlevotes;
+extern consvar_t cv_encorevotes;
+
 typedef enum
 {
 	XD_NAMEANDCOLOR = 1,

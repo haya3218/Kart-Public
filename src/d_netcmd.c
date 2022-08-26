@@ -479,6 +479,11 @@ consvar_t cv_mute = {"mute", "Off", CV_NETVAR|CV_CALL, CV_OnOff, Mute_OnChange, 
 
 consvar_t cv_sleep = {"cpusleep", "1", CV_SAVE, sleeping_cons_t, NULL, -1, NULL, NULL, 0, 0, NULL};
 
+consvar_t cv_lessbattlevotes = {"lessbattlevotes", "Off", CV_SAVE, CV_OnOff, NULL, 0, NULL, NULL, 0, 0, NULL};
+
+static CV_PossibleValue_t encorevotes_cons_t[] = {{0, "One"}, {1, "Except One"}, {0, NULL}};
+consvar_t cv_encorevotes = {"encorevotes", "One", CV_SAVE, encorevotes_cons_t, NULL, 0, NULL, NULL, 0, 0, NULL};
+
 INT16 gametype = GT_RACE; // SRB2kart
 boolean forceresetplayers = false;
 boolean deferencoremode = false;
@@ -733,6 +738,8 @@ void D_RegisterServerCommands(void)
 #ifdef USE_STUN
 	CV_RegisterVar(&cv_stunserver);
 #endif
+	CV_RegisterVar(&cv_lessbattlevotes);
+	CV_RegisterVar(&cv_encorevotes);
 
 	CV_RegisterVar(&cv_discordinvites);
 	RegisterNetXCmd(XD_DISCORD, Got_DiscordInfo);
@@ -2448,14 +2455,47 @@ void D_SetupVote(void)
 	UINT8 *p = buf;
 	INT32 i;
 	UINT8 gt = (cv_kartgametypepreference.value == -1) ? gametype : cv_kartgametypepreference.value;
-	UINT8 secondgt = G_SometimesGetDifferentGametype(gt);
-	INT16 votebuffer[4] = {-1,-1,-1,0};
+	UINT8 secondgt;
+	INT16 votebuffer[3] = {-1,-1,-1};
 
-	if (cv_kartencore.value && gt == GT_RACE)
-		WRITEUINT8(p, (gt|0x80));
+	if (G_RaceGametype() && cv_kartencore.value)
+	{
+		if (cv_encorevotes.value == 0)
+		{
+			secondgt = 0x80;
+		}
+		else
+		{
+			gametype = 0x80;
+			secondgt = G_SometimesGetDifferentGametype(gt);
+		}
+	}
 	else
-		WRITEUINT8(p, gt);
+	{
+		secondgt = G_SometimesGetDifferentGametype(gt);
+	}
+
+	if (G_RaceGametype())
+	{
+		if (cv_encorevotes.value == 1)
+		{
+			gametype |= ( secondgt & 0x80 );
+			secondgt &= ~(0x80);
+		}
+	}
+	else
+	{
+		if (cv_lessbattlevotes.value)
+		{
+			gametype = GT_RACE;
+			secondgt = GT_MATCH;
+		}
+	}
+
+	WRITEUINT8(p, gametype);
 	WRITEUINT8(p, secondgt);
+
+	gametype &= ~0x80;
 	secondgt &= ~0x80;
 
 	for (i = 0; i < 4; i++)
