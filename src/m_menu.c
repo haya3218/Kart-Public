@@ -10535,7 +10535,7 @@ static void M_HandleSetupMultiPlayer(INT32 choice)
 			}
 			else if (cv_skinselectmenu.value == SKINMENUTYPE_GRID && itemOn == 1 && setupm_skinselect < numskins)
 			{
-				setupm_fakeskin = skinsorted[setupm_skinselect];
+				setupm_fakeskin = skinsorted[MapGridSelectToSkin(setupm_skinxpos, setupm_skinypos)];
 				S_StartSound(NULL, sfx_s221);
 			}
 			break;
