@@ -9603,7 +9603,7 @@ static boolean setupm_skinlockedselect;
 #define SELECTEDSTATSCOUNT skinstatscount[setupm_skinxpos][setupm_skinypos]
 #define LASTSELECTEDSTAT skinstats[setupm_skinxpos][setupm_skinypos][skinstatscount[setupm_skinxpos][setupm_skinypos]]
 
-#define SKINGRIDWIDTH 8
+#define SKINGRIDWIDTH 9
 #define SKINGRIDHEIGHT 6
 
 static char *sortNames[] = {
@@ -9698,7 +9698,7 @@ static void M_DrawSetupMultiPlayerMenu(void)
 			barlen = dy/(listlen-SKINGRIDHEIGHT + 1);
 		else
 			barlen = dy;
-		barpos = barlen * setupm_skinypos;
+		barpos = barlen * setupm_skinydrag;
 
 		if (setupm_skinypos >= listlen - SKINGRIDHEIGHT)
 			barlen = dy - barpos;
@@ -9720,13 +9720,11 @@ static void M_DrawSetupMultiPlayerMenu(void)
 	switch (cv_skinselectmenu.value)
 	{
 		case SKINMENUTYPE_GRID:
-#define GETSELECTEDSKINNAME (itemOn == 1 && setupm_skinselect < numskins ? skins[skinsorted[setupm_skinselect]].realname : skins[setupm_fakeskin].realname)
 			//tw = V_StringWidth("Character", 0);//V_StringWidth(GETSELECTEDSKINNAME, 0);
 			st = V_StringWidth(skins[skintodisplay].realname, 0);
 			V_DrawString(mx + 54 + (72/2), my+65+76,
 				((MP_PlayerSetupMenu[2].status & IT_TYPE) == IT_SPACE ? V_TRANSLUCENT : 0) | highlightflags | V_ALLOWLOWERCASE,
-				GETSELECTEDSKINNAME);
-#undef GETSELECTEDSKINNAME
+				skins[skintodisplay].realname);
 			break;
 		case SKINMENUTYPE_2D:
 			
@@ -9885,7 +9883,7 @@ static void M_DrawSetupMultiPlayerMenu(void)
 			{
 				INT32 x = ((s % SKINGRIDWIDTH) * 18) + ((BASEVIDWIDTH / 2) - (18 * SKINGRIDWIDTH) - 8) + 100 + SKINXSHIFT; //BASEVIDWIDTH / 2 - ((icons + 1) * 24) - 4;
 				INT32 y = ((s / SKINGRIDWIDTH) * 18) + ((BASEVIDHEIGHT / 2) - (18 * (SKINGRIDWIDTH/2))); //BASEVIDWIDTH / 2 - ((icons + 1) * 24) - 4;
-				INT32 calcs = s + (setupm_skinypos * SKINGRIDWIDTH);
+				INT32 calcs = s + (setupm_skinydrag * SKINGRIDWIDTH);
 				INT16 skinn;
 				patch_t *face;
 				UINT8 *cmap;
@@ -9909,40 +9907,35 @@ static void M_DrawSetupMultiPlayerMenu(void)
 			if (itemOn == 1) //has to be on skin select part
 			{
 				patch_t *cursor;
-				INT32 curx = (((setupm_skinselect % SKINGRIDWIDTH) * 18) + ((BASEVIDWIDTH / 2) - (18 * SKINGRIDWIDTH/2)) + SKINXSHIFT) + 20;
-				INT32 cury = (((setupm_skinselect / SKINGRIDWIDTH) - setupm_skinypos) * 18) + ((BASEVIDHEIGHT / 2) - (18 * (SKINGRIDWIDTH/2)));
+				INT32 curx = ((setupm_skinxpos * 18) + ((BASEVIDWIDTH / 2) - (18 * SKINGRIDWIDTH/2)) + SKINXSHIFT);
+				INT32 cury = (max(min(setupm_skinypos - setupm_skinydrag, SKINGRIDHEIGHT), 0) * 18) + ((BASEVIDHEIGHT / 2) - (18 * (SKINGRIDWIDTH/2)));
 
-				if (setupm_skinselect < numskins)
+				if (skintodisplay < numskins)
 				{
-					UINT8 *cmap = R_GetTranslationColormap(skinsorted[setupm_skinselect], setupm_fakecolor, GTC_MENUCACHE);
+					UINT8 *cmap = R_GetTranslationColormap(skintodisplay, setupm_fakecolor, GTC_MENUCACHE);
 
-					cursor = facewantprefix[skinsorted[setupm_skinselect]];
-					V_DrawFixedPatch(((curx-8) << FRACBITS), ((cury-8) << FRACBITS), FRACUNIT, 0, cursor, cmap);
-				}
-				else
-				{
-					UINT8 cursorframe = (I_GetTime() / 4) % 7;
-					
-					cursor = W_CachePatchName(va("K_CHILI%d", cursorframe + 1), PU_CACHE);
-					V_DrawFixedPatch((curx << FRACBITS) - (FRACUNIT), (cury << FRACBITS) - (FRACUNIT), FRACUNIT+(FRACUNIT>>3), 0, cursor, NULL);
+					cursor = facewantprefix[skintodisplay];
+					V_DrawFixedPatch(((curx + 3) << FRACBITS), ((cury-8) << FRACBITS), FRACUNIT, 0, cursor, cmap);
 				}
 			}
 
-			{ // stat dot
-				INT32 selectedskin = (itemOn == 1 && setupm_skinselect < numskins ? skinsorted[setupm_skinselect] : setupm_fakeskin);
-				speed = skins[selectedskin].kartspeed;
-				weight = skins[selectedskin].kartweight;
-				statdot = W_CachePatchName("K_SDOT1", PU_CACHE);
-				if (skullAnimCounter < 4) // SRB2Kart: we draw this dot later so that it's not covered if there's multiple skins with the same stats
-					V_DrawFixedPatch((((statx+46+GRIDSTATOFFSET) + (speed*4))<<FRACBITS) + (FRACUNIT>>1), (((staty+71) + (weight*4))<<FRACBITS), FRACUNIT>>1, 0, statdot, flashcol);
-				else
-					V_DrawFixedPatch((((statx+46+GRIDSTATOFFSET) + (speed*4))<<FRACBITS) + (FRACUNIT>>1), (((staty+71) + (weight*4))<<FRACBITS), FRACUNIT>>1, 0, statdot, NULL);
+			// stat dot
+			speed = skins[skintodisplay].kartspeed;
+			weight = skins[skintodisplay].kartweight;
+			statdot = W_CachePatchName("K_SDOT1", PU_CACHE);
+			if (skullAnimCounter < 4) // SRB2Kart: we draw this dot later so that it's not covered if there's multiple skins with the same stats
+				V_DrawFixedPatch((((statx+46+GRIDSTATOFFSET) + (speed*4))<<FRACBITS) + (FRACUNIT>>1), (((staty+71) + (weight*4))<<FRACBITS), FRACUNIT>>1, 0, statdot, flashcol);
+			else
+				V_DrawFixedPatch((((statx+46+GRIDSTATOFFSET) + (speed*4))<<FRACBITS) + (FRACUNIT>>1), (((staty+71) + (weight*4))<<FRACBITS), FRACUNIT>>1, 0, statdot, NULL);
 
-				statdot = W_CachePatchName("K_SDOT2", PU_CACHE); // coloured center
-				if (setupm_fakecolor)
-					V_DrawFixedPatch((((statx+46+GRIDSTATOFFSET) + (speed*4))<<FRACBITS) + (FRACUNIT>>1), (((staty+71) + (weight*4))<<FRACBITS), FRACUNIT>>1, 0, statdot, R_GetTranslationColormap(0, setupm_fakecolor, GTC_MENUCACHE));
-			}
+			statdot = W_CachePatchName("K_SDOT2", PU_CACHE); // coloured center
+			if (setupm_fakecolor)
+				V_DrawFixedPatch((((statx+46+GRIDSTATOFFSET) + (speed*4))<<FRACBITS) + (FRACUNIT>>1), (((staty+71) + (weight*4))<<FRACBITS), FRACUNIT>>1, 0, statdot, R_GetTranslationColormap(0, setupm_fakecolor, GTC_MENUCACHE));
+
 			break;
+
+#undef GRIDSTATOFFSET
+
 		case SKINMENUTYPE_2D:
 			//better select screen
 			for (s = 0; s < MAXSTAT; s++)
@@ -10044,7 +10037,7 @@ static void M_DrawSetupMultiPlayerMenu(void)
 	{
 		const INT32 icons = 4;
 		INT32 k = -icons;
-		INT16 col = setupm_fakeskin - icons;
+		INT16 col = skintodisplay - icons;
 		INT32 x = BASEVIDWIDTH/2 - ((icons+1)*24) - 4;
 		fixed_t scale = FRACUNIT/2;
 		INT32 offx = 8, offy = 8;
@@ -10121,7 +10114,7 @@ static void M_DrawSetupMultiPlayerMenu(void)
 			}
 			break;
 		case SKINMENUTYPE_GRID:
-			skintodisplay = (itemOn == 1 && setupm_skinselect < numskins ? skinsorted[setupm_skinselect] : setupm_fakeskin);
+			//skintodisplay = (itemOn == 1 && setupm_skinselect < numskins ? skinsorted[setupm_skinselect] : setupm_fakeskin);
 			if (R_SkinAvailable(skins[skintodisplay].name) != -1)
 				sprdef = &skins[R_SkinAvailable(skins[skintodisplay].name)].spritedef;
 			else
@@ -10177,6 +10170,14 @@ static void M_DrawSetupMultiPlayerMenu(void)
 #undef charw
 }
 
+//
+// Maps a CSS grid selection cursor x and cursor y to a skin selection
+//
+int MapGridSelectToSkin(UINT8 selx, UINT8 sely)
+{
+	return (selx % SKINGRIDWIDTH) + (sely * SKINGRIDWIDTH);
+}
+
 // Handle 1P/2P MP Setup
 static void M_HandleSetupMultiPlayer(INT32 choice)
 {
@@ -10208,27 +10209,32 @@ static void M_HandleSetupMultiPlayer(INT32 choice)
 				S_StartSound(NULL,sfx_menu1); // Tails
 				break;
 			}
-			else if (cv_skinselectmenu.value == SKINMENUTYPE_GRID) //grid skin select menu
+			else if (cv_skinselectmenu.value == SKINMENUTYPE_GRID)
 			{
 				if (itemOn == 1) //if we are on the skin select menu
 				{
-					if (setupm_skinselect < ROUNDSKINSUPTO8 - SKINGRIDWIDTH) //if we arent at the bottom of the menu
+					if (MapGridSelectToSkin(setupm_skinxpos, setupm_skinypos + 1) > numskins - 1)
 					{
-						setupm_skinselect += SKINGRIDWIDTH;
-						if (setupm_skinselect >= ((setupm_skinypos-1)+SKINGRIDHEIGHT)*8 && setupm_skinypos < (ROUNDSKINSUPTO8/8)-SKINGRIDHEIGHT)
-							setupm_skinypos++;
+						if (MapGridSelectToSkin(0, setupm_skinydrag + SKINGRIDHEIGHT) <= numskins - 1)
+							setupm_skinydrag++;
+						M_NextOpt();
 					}
 					else
 					{
-						M_NextOpt();
+						setupm_skinypos++;
+
+						if ((setupm_skinypos - setupm_skinydrag) > SKINGRIDHEIGHT - 1)
+							setupm_skinydrag++;
 					}
 					S_StartSound(NULL, sfx_menu1);
+					break;
 				}
 				else if (itemOn == 0)
 				{
-					setupm_skinselect = 0;
-					setupm_skinypos = 0;
+					setupm_skinypos = setupm_skinydrag;
 					M_NextOpt();
+					S_StartSound(NULL, sfx_menu1);
+					break;
 				}
 				else
 					M_NextOpt();
@@ -10257,29 +10263,41 @@ static void M_HandleSetupMultiPlayer(INT32 choice)
 			}
 			else if (cv_skinselectmenu.value == SKINMENUTYPE_GRID)
 			{
-				if (itemOn == 1)
+				if (itemOn == 1) //if we are on the skin select menu
 				{
-					if (setupm_skinselect >= SKINGRIDWIDTH) //if we arent at the top of the menu
+					if (setupm_skinypos == 0)
 					{
-						setupm_skinselect -= SKINGRIDWIDTH;
-						if (setupm_skinselect < ((setupm_skinypos+1)*SKINGRIDWIDTH) && setupm_skinypos > 0)
+						M_PrevOpt();
+					}
+					else
+					{
+						setupm_skinypos--;
+
+						if (setupm_skinypos < setupm_skinydrag)
+							setupm_skinydrag--;
+					}
+					S_StartSound(NULL, sfx_menu1);
+					break;
+				}
+				else if (itemOn == 2)
+				{
+					if (MapGridSelectToSkin(setupm_skinxpos, setupm_skinydrag + SKINGRIDHEIGHT - 1) >= numskins)
+					{
+						setupm_skinypos = ((numskins - 1)/SKINGRIDWIDTH);
+						if (MapGridSelectToSkin(setupm_skinxpos, setupm_skinypos) >= numskins)
 							setupm_skinypos--;
 					}
 					else
 					{
-						M_PrevOpt();
+						setupm_skinypos = setupm_skinydrag + SKINGRIDHEIGHT - 1;
 					}
-					S_StartSound(NULL, sfx_menu1);
-				}
-				else if (itemOn == 2)
-				{
-					setupm_skinselect = numskins - 1;
-					setupm_skinypos = (((numskins / SKINGRIDWIDTH) - (SKINGRIDHEIGHT-1)) > 0 ? ((numskins / SKINGRIDWIDTH) - (SKINGRIDHEIGHT-1)) : 0);
 					M_PrevOpt();
+					S_StartSound(NULL, sfx_menu1);
+					break;
 				}
 				else
-					M_PrevOpt();
-				S_StartSound(NULL,sfx_menu1); // Tails
+				M_PrevOpt();
+				S_StartSound(NULL, sfx_menu1); // Tails
 				break;
 			}
 			M_PrevOpt();
@@ -10309,17 +10327,23 @@ static void M_HandleSetupMultiPlayer(INT32 choice)
 			}
 			else if (cv_skinselectmenu.value == SKINMENUTYPE_GRID && itemOn == 1)
 			{
-				if (setupm_skinselect > 0)
+				if (setupm_skinxpos == 0)
 				{
-					setupm_skinselect--;
-					if (setupm_skinselect < ((setupm_skinypos+1)*SKINGRIDWIDTH) && setupm_skinypos > 0)
+					if (MapGridSelectToSkin(SKINGRIDWIDTH - 1, setupm_skinypos) > (numskins-1))
+						setupm_skinxpos = numskins - (setupm_skinypos * SKINGRIDWIDTH) - 1;
+					else
+						setupm_skinxpos = SKINGRIDWIDTH - 1;
+					if (setupm_skinypos > 0)
+					{
+						setupm_skinxpos = SKINGRIDWIDTH - 1;
 						setupm_skinypos--;
+						if (setupm_skinypos < setupm_skinydrag)
+							setupm_skinydrag--;
+					}
 				}
 				else
 				{
-					INT32 roundedskins = ROUNDSKINSUPTO8;
-					setupm_skinselect = roundedskins-1;
-					setupm_skinypos = (((roundedskins/8) - SKINGRIDHEIGHT) > 0 ? (roundedskins/8) - SKINGRIDHEIGHT : 0);
+					setupm_skinxpos--;
 				}
 				S_StartSound(NULL, sfx_menu1);
 				break;
@@ -10359,16 +10383,20 @@ static void M_HandleSetupMultiPlayer(INT32 choice)
 			}
 			else if (cv_skinselectmenu.value == SKINMENUTYPE_GRID && itemOn == 1)
 			{
-				if (setupm_skinselect < ROUNDSKINSUPTO8 - 1)
+				if ((setupm_skinxpos + 1 == SKINGRIDWIDTH) || (MapGridSelectToSkin(setupm_skinxpos + 1, setupm_skinypos) > (numskins - 1)))
 				{
-					setupm_skinselect++;
-					if (setupm_skinselect >= ((setupm_skinypos-1)+SKINGRIDHEIGHT)*8 && setupm_skinypos < (ROUNDSKINSUPTO8/8)-SKINGRIDHEIGHT)
+					setupm_skinxpos = 0;
+					if (MapGridSelectToSkin(setupm_skinxpos, setupm_skinypos + 1) <= (numskins - 1))
+					{
 						setupm_skinypos++;
+
+						if ((setupm_skinypos - setupm_skinydrag) > SKINGRIDHEIGHT - 1)
+							setupm_skinydrag++;
+					}
 				}
 				else
 				{
-					setupm_skinselect = 0;
-					setupm_skinypos = 0;
+					setupm_skinxpos++;
 				}
 				S_StartSound(NULL, sfx_menu1);
 				break;
@@ -10435,6 +10463,40 @@ static void M_HandleSetupMultiPlayer(INT32 choice)
 			}
 			break;
 
+		case KEY_PGDN:
+			if (cv_skinselectmenu.value == SKINMENUTYPE_GRID)
+			{
+				if (itemOn == 1) //if we are on the skin select menu
+				{
+					if (MapGridSelectToSkin(0, setupm_skinydrag + SKINGRIDHEIGHT) <= numskins - 1)
+					{
+						S_StartSound(NULL, sfx_menu1);
+						setupm_skinydrag++;
+						if (setupm_skinypos < setupm_skinydrag)
+							setupm_skinypos++;
+						if (MapGridSelectToSkin(setupm_skinxpos, setupm_skinypos) > numskins - 1)
+							setupm_skinxpos = 0;
+					}
+				}
+			}
+			break;
+
+		case KEY_PGUP:
+			if (cv_skinselectmenu.value == SKINMENUTYPE_GRID)
+			{
+				if (itemOn == 1) //if we are on the skin select menu
+				{
+					if (setupm_skinydrag)
+					{
+						S_StartSound(NULL, sfx_menu1);
+						setupm_skinydrag--;
+						if (setupm_skinypos >= setupm_skinydrag + SKINGRIDHEIGHT)
+							setupm_skinypos--;
+					}
+				}
+			}
+			break;
+
 		//c why?????
 		//case gamecontrol[gc_accelerate][0]:
 		//case gamecontrol[gc_accelerate][1]:
@@ -10480,6 +10542,9 @@ static void M_HandleSetupMultiPlayer(INT32 choice)
 			break;
 		}
 #undef BREAKWHENLOCKED
+
+		if (cv_skinselectmenu.value == SKINMENUTYPE_GRID && !exitmenu)
+			setupm_skinselect = skinsorted[MapGridSelectToSkin(setupm_skinxpos, setupm_skinypos)];
 
 		// check skin
 		if (setupm_fakeskin < 0)
@@ -10543,6 +10608,7 @@ static void M_SetupMultiPlayer(INT32 choice)
 	setupm_cvname = &cv_playername;
 	setupm_skinxpos = 4;
 	setupm_skinypos = 0;
+	setupm_skinydrag = 0;
 	setupm_skinlockedselect = false;
 
 	// For whatever reason this doesn't work right if you just use ->value
@@ -10580,6 +10646,7 @@ static void M_SetupMultiPlayer2(INT32 choice)
 	setupm_cvname = &cv_playername2;
 	setupm_skinxpos = 4;
 	setupm_skinypos = 0;
+	setupm_skinydrag = 0;
 	setupm_skinlockedselect = false;
 
 	// For whatever reason this doesn't work right if you just use ->value
@@ -10617,6 +10684,7 @@ static void M_SetupMultiPlayer3(INT32 choice)
 	setupm_cvname = &cv_playername3;
 	setupm_skinxpos = 4;
 	setupm_skinypos = 0;
+	setupm_skinydrag = 0;
 	setupm_skinlockedselect = false;
 
 	// For whatever reason this doesn't work right if you just use ->value
@@ -10654,6 +10722,7 @@ static void M_SetupMultiPlayer4(INT32 choice)
 	setupm_cvname = &cv_playername4;
 	setupm_skinxpos = 4;
 	setupm_skinypos = 0;
+	setupm_skinydrag = 0;
 	setupm_skinlockedselect = false;
 
 	// For whatever reason this doesn't work right if you just use ->value
