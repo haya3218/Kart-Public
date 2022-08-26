@@ -7322,6 +7322,14 @@ static void K_drawKartItem(void)
 	if (stplyr->kartstuff[k_eggmanexplode] > 1 /*&& stplyr->kartstuff[k_eggmanexplode] <= 3*TICRATE*/)
 		V_DrawScaledPatch(fx+17, fy+13-offset, V_HUDTRANS|fflags, kp_eggnum[min(3, G_TicsToSeconds(stplyr->kartstuff[k_eggmanexplode]))]);
 
+	if (cv_showindicator.value) {
+		if (stplyr->kartstuff[k_invincibilitytimer] > 1 && stplyr->kartstuff[k_invincibilitytimer] < 3*TICRATE)
+			V_DrawScaledPatch(fx+17, fy+13-offset, V_HUDTRANS|fflags, kp_eggnum[min(2, G_TicsToSeconds(stplyr->kartstuff[k_invincibilitytimer]))+1]);
+
+		if (stplyr->kartstuff[k_growshrinktimer] > 1 && stplyr->kartstuff[k_growshrinktimer] < 3*TICRATE)
+			V_DrawScaledPatch(fx+17, fy+13-offset, V_HUDTRANS|fflags, kp_eggnum[min(2, G_TicsToSeconds(stplyr->kartstuff[k_growshrinktimer]))+1]);
+	}
+
 }
 
 void K_drawKartTimestamp(tic_t drawtime, INT32 TX, INT32 TY, INT16 emblemmap, UINT8 mode)

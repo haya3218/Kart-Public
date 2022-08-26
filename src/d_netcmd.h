@@ -158,6 +158,8 @@ extern consvar_t cv_sleep;
 extern consvar_t cv_lessbattlevotes;
 extern consvar_t cv_encorevotes;
 
+extern consvar_t cv_powerupmusic;
+
 typedef enum
 {
 	XD_NAMEANDCOLOR = 1,
