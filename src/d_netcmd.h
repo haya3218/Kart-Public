@@ -180,6 +180,7 @@ typedef enum
 
 extern consvar_t cv_skinselectmenu;
 extern consvar_t cv_skinselectgridsort;
+extern consvar_t cv_skinselectspin;
 
 typedef enum
 {
