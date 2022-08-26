@@ -9593,6 +9593,7 @@ static consvar_t *setupm_cvname;
 static UINT8      setupm_skinxpos;
 static INT32      setupm_fakeskin;
 static INT32      setupm_fakecolor;
+static UINT8 	  setupm_skinydrag;
 
 //variables used for other skin select menus
 static UINT8 setupm_skinypos;
@@ -9650,10 +9651,61 @@ static void M_DrawSetupMultiPlayerMenu(void)
 	{
 	case SKINMENUTYPE_GRID:
 		nameboxaddy = 6;
+		staty++;
+		skintodisplay = (itemOn == 1 && setupm_skinselect < numskins ? setupm_skinselect : setupm_fakeskin);
 		break;
 	default:
 		nameboxaddy = 0;
+		skintodisplay = setupm_fakeskin;
 		break;
+	}
+
+#define SKINXSHIFT 37
+
+	//background and scroll bar for grid skin select
+	if (cv_skinselectmenu.value == SKINMENUTYPE_GRID)
+	{
+		INT32 x = ((BASEVIDWIDTH / 2) - (18 * SKINGRIDWIDTH) - 8) + 100 + SKINXSHIFT - 1;
+		INT32 y = ((BASEVIDHEIGHT / 2) - (18 * (SKINGRIDWIDTH/2))) - 1;
+
+		INT32 dx = (SKINGRIDWIDTH * 18);
+		INT32 dy = (SKINGRIDHEIGHT * 18);
+		INT32 scrx = 4; //2 is added to make the final "thickness"
+
+		int listlen;
+		int barlen;
+		int barpos;
+
+		listlen = (numskins)/SKINGRIDWIDTH;
+
+		//draw BG
+		V_DrawFill(x, y, dx, dy, 244);
+
+		//draw scroll bar "back"
+		x += dx + 14;
+		V_DrawFill(x, y, scrx+2, dy, 238);
+		V_DrawFill(x, y, 1, dy, 239);
+		V_DrawFill(x, y + dy - 1, scrx+2, 1, 239);
+		x++;
+		y++;
+		dy -= 2;
+		V_DrawFill(x, y, scrx, dy, 244);
+
+		//draw scroll bar bar
+		if ((numskins) % SKINGRIDWIDTH > 0)
+			listlen++;
+		if (listlen - SKINGRIDHEIGHT > 0)
+			barlen = dy/(listlen-SKINGRIDHEIGHT + 1);
+		else
+			barlen = dy;
+		barpos = barlen * setupm_skinypos;
+
+		if (setupm_skinypos >= listlen - SKINGRIDHEIGHT)
+			barlen = dy - barpos;
+
+		V_DrawFill(x, y + barpos, scrx, barlen, 234);
+		V_DrawFill(x, y + barpos, 1, barlen, 236);
+		V_DrawFill(x, y + barpos + barlen - 1, scrx, 1, 236);
 	}
 
 	M_DrawTextBox(mx + 32, my - 8 + nameboxaddy, MAXPLAYERNAME, 1);
@@ -9669,9 +9721,9 @@ static void M_DrawSetupMultiPlayerMenu(void)
 	{
 		case SKINMENUTYPE_GRID:
 #define GETSELECTEDSKINNAME (itemOn == 1 && setupm_skinselect < numskins ? skins[skinsorted[setupm_skinselect]].realname : skins[setupm_fakeskin].realname)
-			tw = V_StringWidth("Character", 0);//V_StringWidth(GETSELECTEDSKINNAME, 0);
-			st = V_StringWidth(GETSELECTEDSKINNAME, 0);
-			V_DrawString((mx+(tw/2)) - (st/2), my + 37,
+			//tw = V_StringWidth("Character", 0);//V_StringWidth(GETSELECTEDSKINNAME, 0);
+			st = V_StringWidth(skins[skintodisplay].realname, 0);
+			V_DrawString(mx + 54 + (72/2), my+65+76,
 				((MP_PlayerSetupMenu[2].status & IT_TYPE) == IT_SPACE ? V_TRANSLUCENT : 0) | highlightflags | V_ALLOWLOWERCASE,
 				GETSELECTEDSKINNAME);
 #undef GETSELECTEDSKINNAME
@@ -9740,15 +9792,14 @@ static void M_DrawSetupMultiPlayerMenu(void)
 			break;
 	}
 
-#define GRIDSTATOFFSET 0
+#define GRIDSTATOFFSET 46
 
 	switch (cv_skinselectmenu.value)
 	{
 		case SKINMENUTYPE_GRID:
-			// SRB2Kart: draw the stat backer
 			// labels
-			V_DrawSmallString(statx+12+GRIDSTATOFFSET, staty+67, V_6WIDTHSPACE|highlightflags, "Acceleration");
-			V_DrawSmallString(statx+76+GRIDSTATOFFSET, staty+67, V_6WIDTHSPACE|highlightflags, "Max Speed");
+			V_DrawSmallString(statx+40+GRIDSTATOFFSET, staty+67, V_6WIDTHSPACE|highlightflags, "Accel");
+			V_DrawSmallString(statx+76+GRIDSTATOFFSET, staty+67, V_6WIDTHSPACE|highlightflags, "Speed");
 			V_DrawSmallString(statx+14+GRIDSTATOFFSET, staty+75, V_6WIDTHSPACE|highlightflags, "Handling");
 			V_DrawSmallString(statx+21+GRIDSTATOFFSET, staty+108, V_6WIDTHSPACE|highlightflags, "Weight");
 			// label arrows
@@ -9768,14 +9819,13 @@ static void M_DrawSetupMultiPlayerMenu(void)
 			}
 
 			// gonna put the sorttype here as well
-			V_DrawSmallString(statx+85, staty-57, V_6WIDTHSPACE|highlightflags, "Sort:");
-			V_DrawSmallString(statx+89, staty-52, V_6WIDTHSPACE|highlightflags, sortNames[cv_skinselectgridsort.value]);
+			V_DrawSmallString(statx + 84, my + 3, V_6WIDTHSPACE|highlightflags, "Sort:");
+			V_DrawSmallString(statx + 88,  my + 7, V_6WIDTHSPACE|highlightflags, sortNames[cv_skinselectgridsort.value]);
 			if (itemOn == 1)
-				V_DrawSmallString(statx+85, staty-47, V_6WIDTHSPACE|highlightflags, "Backspace: change");
+				V_DrawSmallString(statx + 84,  my + 13, V_6WIDTHSPACE|highlightflags, "Backspace: change");
 
 			break;
 		case SKINMENUTYPE_2D:
-#define SKINXSHIFT 55
 			statx = ((BASEVIDWIDTH / 2) - (18 * 4)) - 8 + SKINXSHIFT;
 			staty = ((BASEVIDHEIGHT / 2) - (18 * 4)) - 8;
 			sltw = V_ThinStringWidth("Accel", V_6WIDTHSPACE);
