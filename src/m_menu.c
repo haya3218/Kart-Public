@@ -331,6 +331,11 @@ static patch_t *addonsp[NUM_EXT+5];
 
 #define numaddonsshown 4
 
+// Bird
+menu_t OP_BirdDef;
+menu_t OP_TiltDef;
+menu_t OP_AdvancedBirdDef;
+
 // Replay hut
 menu_t MISC_ReplayHutDef;
 menu_t MISC_ReplayOptionsDef;
@@ -1097,8 +1102,10 @@ static menuitem_t OP_MainMenu[] =
 
 	{IT_SUBMENU|IT_STRING,		NULL, "Data Options...",		&OP_DataOptionsDef,			100},
 
-	{IT_CALL|IT_STRING,			NULL, "Tricks & Secrets (F1)",	M_Manual,					120},
-	{IT_CALL|IT_STRING,			NULL, "Play Credits",			M_Credits,					130},
+	{IT_SUBMENU|IT_STRING,		NULL, "Birdhouse Options...",	&OP_BirdDef,	110},
+
+	{IT_CALL|IT_STRING,			NULL, "Tricks & Secrets (F1)",	M_Manual,					130},
+	{IT_CALL|IT_STRING,			NULL, "Play Credits",			M_Credits,					140},
 };
 
 static menuitem_t OP_ControlsMenu[] =
@@ -1300,6 +1307,46 @@ enum
 static menuitem_t OP_VideoModeMenu[] =
 {
 	{IT_KEYHANDLER | IT_NOTHING, NULL, "", M_HandleVideoMode, '\0'},     // dummy menuitem for the control func
+};
+
+static menuitem_t OP_BirdMenu[] =
+{
+	{IT_HEADER, NULL, "Crazy", NULL, 0},
+	{IT_STRING | IT_SUBMENU, NULL, "Screen Tilting...", &OP_TiltDef, 10},
+
+	{IT_HEADER, NULL, "HUD", NULL, 30},
+	{IT_STRING | IT_CVAR, NULL, "Show Viewpoint Text in Replays", &cv_showviewpointtext, 40},
+	{IT_STRING | IT_CVAR, NULL, "Show FREE PLAY Text",            &cv_showfreeplay,      50},
+
+	{IT_HEADER, NULL, "Voting", NULL, 70},
+	{IT_STRING | IT_CVAR, NULL, "Only Show One Battle Choice", &cv_lessbattlevotes, 80},
+	{IT_STRING | IT_CVAR, NULL, "Encore Choices",              &cv_encorevotes,     90},
+
+	{IT_HEADER, NULL, "Music", NULL, 110},
+	{IT_STRING | IT_CVAR, NULL, "Resume Level Music",    &cv_resume,            120},
+	{IT_STRING | IT_CVAR, NULL, "Restart Special Music", &cv_resetspecialmusic, 130},
+
+	{IT_STRING | IT_SUBMENU, NULL, "Advanced Music Options...", &OP_AdvancedBirdDef, 150},
+};
+
+enum
+{
+	tilting,
+	tiltwturning,
+	smoothening,
+	tiltwquakes,
+	windowshake,
+};
+
+static menuitem_t OP_TiltMenu[] =
+{
+	{IT_STRING | IT_CVAR, NULL, "Camera Tilting", &cv_tilting, 0},
+	{IT_STRING | IT_CVAR, NULL, "Tilt While Turning", &cv_quaketilt, 10},
+	{IT_STRING | IT_CVAR, NULL, "Smoothing Divisor", &cv_tiltsmoothing, 20},
+
+	{IT_STRING | IT_CVAR, NULL, "Also Tilt During Quakes", &cv_actionmovie, 40},
+
+	{IT_STRING | IT_CVAR, NULL, "\x85" "Window Shaking During Quakes", &cv_windowquake, 60},
 };
 
 #ifdef HWRENDER
@@ -1616,6 +1663,29 @@ static menuitem_t OP_MonitorToggleMenu[] =
 #ifdef ITEMTOGGLEBOTTOMRIGHT
 	{IT_KEYHANDLER | IT_NOTHING, NULL, "---",					M_HandleMonitorToggles, 255},
 #endif
+};
+
+static menuitem_t OP_AdvancedBirdMenu[] =
+{
+	{IT_STRING | IT_CVAR, NULL, "Fading",                        &cv_fading,                  0},
+	{IT_STRING | IT_CVAR, NULL, "Fade Back from Invincibility",  &cv_invincmusicfade,        10},
+	{IT_STRING | IT_CVAR, NULL, "Fade Back from Grow",           &cv_growmusicfade,          20},
+	{IT_STRING | IT_CVAR, NULL, "Fade Out Before Respawning",    &cv_respawnfademusicout,    30},
+	{IT_STRING | IT_CVAR, NULL, "Fade Back In While Respawning", &cv_respawnfademusicback,   40},
+
+	{IT_STRING | IT_CVAR, NULL, "Resync Threshold",          &cv_music_resync_threshold,     60},
+	{IT_STRING | IT_CVAR, NULL, "Resync Special Music Only", &cv_music_resync_powerups_only, 70},
+};
+
+enum
+{
+	fading,
+	fadeinvinc,
+	fadegrow,
+	respawnfadeout,
+	respawnfadein,
+	syncthreshold,
+	syncspecialonly,
 };
 
 // ==========================================================================
@@ -2114,6 +2184,7 @@ menu_t OP_OpenGLColorDef =
 	NULL
 };
 #endif
+
 menu_t OP_DataOptionsDef = DEFAULTMENUSTYLE("M_DATA", OP_DataOptionsMenu, &OP_MainDef, 60, 30);
 menu_t OP_ScreenshotOptionsDef = DEFAULTMENUSTYLE("M_SCSHOT", OP_ScreenshotOptionsMenu, &OP_DataOptionsDef, 30, 30);
 menu_t OP_AddonsOptionsDef = DEFAULTMENUSTYLE("M_ADDONS", OP_AddonsOptionsMenu, &OP_DataOptionsDef, 30, 30);
@@ -2121,6 +2192,9 @@ menu_t OP_AddonsOptionsDef = DEFAULTMENUSTYLE("M_ADDONS", OP_AddonsOptionsMenu, 
 menu_t OP_DiscordOptionsDef = DEFAULTMENUSTYLE(NULL, OP_DiscordOptionsMenu, &OP_DataOptionsDef, 30, 30);
 #endif
 menu_t OP_EraseDataDef = DEFAULTMENUSTYLE("M_DATA", OP_EraseDataMenu, &OP_DataOptionsDef, 30, 30);
+menu_t OP_BirdDef = DEFAULTMENUSTYLE(NULL, OP_BirdMenu, &OP_MainDef, 30, 30);
+menu_t OP_TiltDef = DEFAULTMENUSTYLE(NULL, OP_TiltMenu, &OP_BirdDef, 30, 60);
+menu_t OP_AdvancedBirdDef = DEFAULTMENUSTYLE(NULL, OP_AdvancedBirdMenu, &OP_BirdDef, 30, 60);
 
 // ==========================================================================
 // CVAR ONCHANGE EVENTS GO HERE
@@ -2368,6 +2442,38 @@ void Addons_option_Onchange(void)
 {
 	OP_AddonsOptionsMenu[op_addons_folder].status =
 		(cv_addons_option.value == 3 ? IT_CVAR|IT_STRING|IT_CV_STRING : IT_DISABLED);
+}
+
+void Bird_menu_Onchange(void)
+{
+	UINT16 status;
+
+	if (cv_tilting.value)
+	{
+		status = IT_STRING | IT_CVAR;
+	}
+	else
+	{
+		status = IT_GRAYEDOUT;
+	}
+
+	OP_TiltMenu[tiltwturning].status = status;
+	OP_TiltMenu[smoothening].status = status;
+	OP_TiltMenu[tiltwquakes].status = status;
+
+	if (cv_fading.value)
+	{
+		status = IT_STRING | IT_CVAR;
+	}
+	else
+	{
+		status = IT_GRAYEDOUT;
+	}
+
+	OP_AdvancedBirdMenu[fadeinvinc].status = status;
+	OP_AdvancedBirdMenu[fadegrow].status = status;
+	OP_AdvancedBirdMenu[respawnfadeout].status = status;
+	OP_AdvancedBirdMenu[respawnfadein].status = status;
 }
 
 // ==========================================================================
@@ -10057,7 +10163,7 @@ static void M_DrawJoystick(void)
 		compareval4 = cv_usejoystick4.value;
 		compareval3 = cv_usejoystick3.value;
 		compareval2 = cv_usejoystick2.value;
-		compareval = cv_usejoystick.value
+		compareval = cv_usejoystick.value;
 #endif
 
 		if ((setupcontrolplayer == 4 && (i == compareval4))

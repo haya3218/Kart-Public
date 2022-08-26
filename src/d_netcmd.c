@@ -2485,7 +2485,7 @@ void D_SetupVote(void)
 	}
 	else
 	{
-		if (cv_lessbattlevotes.value)
+		if (cv_lessbattlevotes.value && cv_kartgametypepreference.value == -1)
 		{
 			gametype = GT_RACE;
 			secondgt = GT_MATCH;
