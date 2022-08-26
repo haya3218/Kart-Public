@@ -195,6 +195,8 @@ static void M_HandleServerPage(INT32 choice);
 void M_SetWaitingMode(int mode);
 int  M_GetWaitingMode(void);
 
+int MapGridSelectToSkin(UINT8 selx, UINT8 sely);
+
 // the haxor message menu
 menu_t MessageDef;
 

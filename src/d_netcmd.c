@@ -485,7 +485,7 @@ static CV_PossibleValue_t encorevotes_cons_t[] = {{0, "One"}, {1, "Except One"},
 consvar_t cv_encorevotes = {"encorevotes", "One", CV_SAVE, encorevotes_cons_t, NULL, 0, NULL, NULL, 0, 0, NULL};
 
 consvar_t cv_powerupmusic = {"powerupmusic", "On", CV_SAVE, CV_OnOff, NULL, 0, NULL, NULL, 0, 0, NULL};
-static CV_PossibleValue_t skinselectmenu_t[] = {{SKINMENUTYPE_SCROLL, "Scoll"}, {SKINMENUTYPE_2D, "2d"}, {SKINMENUTYPE_GRID, "Grid"}, {0, NULL}};
+static CV_PossibleValue_t skinselectmenu_t[] = {{SKINMENUTYPE_SCROLL, "Scroll"}, {SKINMENUTYPE_2D, "2D"}, {SKINMENUTYPE_GRID, "Grid"}, {0, NULL}};
 consvar_t cv_skinselectmenu = {"skinselectmenu", "Grid", CV_SAVE, skinselectmenu_t, NULL, 0, NULL, NULL, 0, 0, NULL};
 
 static CV_PossibleValue_t skinselectgridsort_t[] ={
@@ -499,6 +499,8 @@ static CV_PossibleValue_t skinselectgridsort_t[] ={
 };
 consvar_t cv_skinselectgridsort ={ "skinselectgridsort", "Real name", CV_SAVE|CV_CALL|CV_NOINIT, skinselectgridsort_t, sortSkinGrid, 0, NULL, NULL, 0, 0, NULL };
 consvar_t cv_skinselectspin = {"skinselectspin", "4", CV_SAVE, CV_Unsigned, NULL, 0, NULL, NULL, 0, 0, NULL};
+
+consvar_t cv_showmininames = {"showminimapnames", "On", CV_SAVE, CV_OnOff, NULL, 0, NULL, NULL, 0, 0, NULL};
 
 INT16 gametype = GT_RACE; // SRB2kart
 boolean forceresetplayers = false;

@@ -402,6 +402,111 @@ UINT8 colortranslations[MAXTRANSLATIONS][16] = {
 	{120, 120,  96,  96,  97,  98,  98,  99,  81,  81,  69,  71,  73,  75,  77,  79}, // SKINCOLOR_CSUPER5
 };
 
+// Jaden: LOL
+static void V_DrawSmallStringAtFixed(fixed_t x, fixed_t y, INT32 option, const char *string)
+{
+	fixed_t cx = x, cy = y;
+	INT32 w, c, dupx, dupy, scrwidth, center = 0, left = 0;
+	const char *ch = string;
+	INT32 charflags = 0;
+	const UINT8 *colormap = NULL;
+	INT32 spacewidth = 2, charwidth = 0;
+
+	INT32 lowercase = (option & V_ALLOWLOWERCASE);
+	option &= ~V_FLIP; // which is also shared with V_ALLOWLOWERCASE...
+
+	if (option & V_NOSCALESTART)
+	{
+		dupx = vid.dupx;
+		dupy = vid.dupy;
+		scrwidth = vid.width;
+	}
+	else
+	{
+		dupx = dupy = 1;
+		scrwidth = vid.width/vid.dupx;
+		left = (scrwidth - BASEVIDWIDTH)/2;
+		scrwidth -= left;
+	}
+
+	if (option & V_NOSCALEPATCH)
+		scrwidth *= vid.dupx;
+
+	charflags = (option & V_CHARCOLORMASK);
+
+	switch (option & V_SPACINGMASK)
+	{
+		case V_MONOSPACE:
+			spacewidth = 4;
+			/* FALLTHRU */
+		case V_OLDSPACING:
+			charwidth = 4;
+			break;
+		case V_6WIDTHSPACE:
+			spacewidth = 3;
+		default:
+			break;
+	}
+
+	for (;;ch++)
+	{
+		if (!*ch)
+			break;
+		if (*ch & 0x80) //color parsing -x 2.16.09
+		{
+			// manually set flags override color codes
+			if (!(option & V_CHARCOLORMASK))
+				charflags = ((*ch & 0x7f) << V_CHARCOLORSHIFT) & V_CHARCOLORMASK;
+			continue;
+		}
+		if (*ch == '\n')
+		{
+			cx = x;
+
+			if (option & V_RETURN8)
+				cy += (4*dupy)<<FRACBITS;
+			else
+				cy += (6*dupy)<<FRACBITS;
+
+			continue;
+		}
+
+		c = *ch;
+		if (!lowercase)
+			c = toupper(c);
+		c -= HU_FONTSTART;
+
+		// character does not exist or is a space
+		if (c < 0 || c >= HU_FONTSIZE || !hu_font[c])
+		{
+			cx += (spacewidth * dupx)<<FRACBITS;
+			continue;
+		}
+
+		if (charwidth)
+		{
+			w = charwidth * dupx;
+			center = w/2 - hu_font[c]->width*(dupx/4);
+		}
+		else
+			w = hu_font[c]->width * dupx / 2;
+
+		if ((cx>>FRACBITS) > scrwidth)
+			break;
+		if ((cx>>FRACBITS)+left + w < 0) //left boundary check
+		{
+			cx += w<<FRACBITS;
+			continue;
+		}
+
+		colormap = V_GetStringColormap(charflags);
+
+		V_DrawFixedPatch(cx + (center<<FRACBITS), cy, FRACUNIT/2, option, hu_font[c], colormap);
+
+		cx += w<<FRACBITS;
+	}
+}
+
 // Define for getting accurate color brightness readings according to how the human eye sees them.
 // https://en.wikipedia.org/wiki/Relative_luminance
 // 0.2126 to red
@@ -590,6 +695,8 @@ void K_RegisterKartStuff(void)
 	CV_RegisterVar(&cv_kartdebugcheckpoint);
 	CV_RegisterVar(&cv_kartdebugnodes);
 	CV_RegisterVar(&cv_kartdebugcolorize);
+
+	CV_RegisterVar(&cv_showmininames);
 }
 
 //}
@@ -7095,14 +7202,14 @@ static void K_drawKartItem(void)
 				localpatch = kp_thundershield[offset];
 				//localcolor = SKINCOLOR_CYAN;
 				break;
-			/*case 14: // Pogo Spring
+			case 14: // Pogo Spring
 				localpatch = kp_pogospring[offset];
-				localcolor = SKINCOLOR_TANGERINE;
+				//localcolor = SKINCOLOR_TANGERINE;
 				break;
 			case 15: // Kitchen Sink
 				localpatch = kp_kitchensink[offset];
-				localcolor = SKINCOLOR_STEEL;
-				break;*/
+				//localcolor = SKINCOLOR_STEEL;
+				break;
 			default:
 				break;
 		}
@@ -7163,7 +7270,7 @@ static void K_drawKartItem(void)
 		}
 		else
 		{
-			if (stplyr->kartstuff[k_itemamount] <= 0)
+			if (stplyr->kartstuff[k_itemamount] <= 0 && (stplyr->kartstuff[k_growshrinktimer] <= 0 || stplyr->kartstuff[k_invincibilitytimer] <= 0))
 				return;
 
 			switch(stplyr->kartstuff[k_itemtype])
@@ -7223,7 +7330,8 @@ static void K_drawKartItem(void)
 					localpatch = kp_sadface[offset];
 					break;
 				default:
-					return;
+					localpatch = kp_nodraw;
+					break;
 			}
 
 			if (stplyr->kartstuff[k_itemheld] && !(leveltime & 1))
@@ -7276,7 +7384,8 @@ static void K_drawKartItem(void)
 	if (localcolor != SKINCOLOR_NONE)
 		colmap = R_GetTranslationColormap(colormode, localcolor, GTC_CACHE);
 
-	V_DrawScaledPatch(fx, fy, V_HUDTRANS|fflags, localbg);
+	UINT8 *bgcolor = R_GetTranslationColormap(TC_RAINBOW, ((stplyr->skincolor) ? stplyr->skincolor : SKINCOLOR_JAWZ), GTC_CACHE);
+	V_DrawFixedPatch(fx << FRACBITS, fy << FRACBITS, FRACUNIT, V_HUDTRANS|fflags, localbg, bgcolor);
 
 	// Then, the numbers:
 	if (stplyr->kartstuff[k_itemamount] >= numberdisplaymin && !stplyr->kartstuff[k_itemroulette])
@@ -7491,7 +7600,7 @@ static void K_DrawKartPositionNum(INT32 num)
 	boolean win = (stplyr->exiting && num == 1);
 	//INT32 X = POSI_X;
 	INT32 W = SHORT(kp_positionnum[0][0]->width);
-	fixed_t scale = FRACUNIT;
+	fixed_t scale = FRACUNIT/2;
 	patch_t *localpatch = kp_positionnum[0][0];
 	//INT32 splitflags = K_calcSplitFlags(V_SNAPTOBOTTOM|V_SNAPTORIGHT);
 	INT32 fx = 0, fy = 0, fflags = 0;
@@ -7501,11 +7610,9 @@ static void K_DrawKartPositionNum(INT32 num)
 
 	if (stplyr->kartstuff[k_positiondelay] || stplyr->exiting)
 	{
-		scale *= 2;
+		scale = FRACUNIT;
 		overtake = true;	// this is used for splitscreen stuff in conjunction with flipdraw.
 	}
-	if (splitscreen)
-		scale /= 2;
 
 	W = FixedMul(W<<FRACBITS, scale)>>FRACBITS;
 
@@ -7759,10 +7866,10 @@ void HU_DrawTabRankings(INT32 x, INT32 y, playersort_t *tab, INT32 scorelines, I
 	//I_Assert(scorelines <= 9); -- not today bitch, kart fixed it up
 
 	V_DrawFill(1-duptweak, 26, dupadjust-2, 1, 0); // Draw a horizontal line because it looks nice!
+	V_DrawFill(1-duptweak, 173, dupadjust-2, 1, 0); // And a horizontal line near the bottom.
 	if (scorelines > 8)
 	{
 		V_DrawFill(160, 26, 1, 147, 0); // Draw a vertical line to separate the two sides.
-		V_DrawFill(1-duptweak, 173, dupadjust-2, 1, 0); // And a horizontal line near the bottom.
 		rightoffset = (BASEVIDWIDTH/2) - 4 - x;
 	}
 
@@ -8243,12 +8350,20 @@ static void K_drawKartMinimapHead(mobj_t *mo, INT32 x, INT32 y, INT32 flags, pat
 			colormap = R_GetTranslationColormap(TC_RAINBOW, mo->color, GTC_CACHE);
 		else
 			colormap = R_GetTranslationColormap(skin, mo->color, GTC_CACHE);
-		V_DrawFixedPatch(amxpos, amypos, FRACUNIT, flags, facemmapprefix[skin], colormap);
+		V_DrawFixedPatch(amxpos + (2 * FRACUNIT), amypos + (2 * FRACUNIT), FRACUNIT / 2, flags, facemmapprefix[skin], colormap);
+		if (cv_showmininames.value)
+		{
+			if (modeattacking || gamestate == GS_TIMEATTACK) // Don't show names on RA, due to ghosts.
+				return;
+
+			const char *player_name = va("%s%s", V_ApproximateSkinColorCode(mo->color), player_names[mo->player - players]);
+			V_DrawSmallStringAtFixed((amxpos + (4 * FRACUNIT)) - ((V_SmallStringWidth(player_name, V_ALLOWLOWERCASE|flags) / 2) << FRACBITS), amypos - (3 * FRACUNIT), V_ALLOWLOWERCASE|flags, player_name);
+		}
 		if (mo->player
 			&& ((G_RaceGametype() && mo->player->kartstuff[k_position] == spbplace)
 			|| (G_BattleGametype() && K_IsPlayerWanted(mo->player))))
 		{
-			V_DrawFixedPatch(amxpos - (4<<FRACBITS), amypos - (4<<FRACBITS), FRACUNIT, flags, kp_wantedreticle, NULL);
+			V_DrawFixedPatch(amxpos, amypos, FRACUNIT / 2, flags, kp_wantedreticle, NULL);
 		}
 	}
 }
@@ -8889,8 +9004,7 @@ void K_drawKartFreePlay(UINT32 flashtime)
 	if ((flashtime % TICRATE) < TICRATE/2)
 		return;
 
-	V_DrawKartString((BASEVIDWIDTH - (LAPS_X+1)) - (12*9), // mirror the laps thingy
-		LAPS_Y+3, V_SNAPTOBOTTOM|V_SNAPTORIGHT|V_HUDTRANS, "FREE PLAY");
+	V_DrawCenteredString(160, 182, V_SNAPTOBOTTOM|V_YELLOWMAP|V_ALLOWLOWERCASE|V_HUDTRANS, "Free Play");
 }
 
 static void K_drawDistributionDebugger(void)
@@ -9097,6 +9211,13 @@ void K_drawKartHUD(void)
 
 	if (!stplyr->spectator && !demo.freecam) // Bottom of the screen elements, don't need in spectate mode
 	{
+		if (!(splitscreen || demo.title))
+		{
+			// Draw the input UI, dont do it on splitscreen doe.
+			if (LUA_HudEnabled(hud_position))
+				K_drawInput();
+		}
+
 		if (demo.title) // Draw title logo instead in demo.titles
 		{
 			INT32 x = BASEVIDWIDTH - 32, y = 128, offs;
@@ -9146,14 +9267,6 @@ void K_drawKartHUD(void)
 				if (LUA_HudEnabled(hud_position))
 #endif
 					K_DrawKartPositionNum(stplyr->kartstuff[k_position]);
-			}
-			else //if (!(demo.playback && hu_showscores))
-			{
-				// Draw the input UI
-#ifdef HAVE_BLUA
-				if (LUA_HudEnabled(hud_position))
-#endif
-					K_drawInput();
 			}
 		}
 		else if (G_BattleGametype()) // Battle-only

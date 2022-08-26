@@ -160,6 +160,8 @@ extern consvar_t cv_encorevotes;
 
 extern consvar_t cv_powerupmusic;
 
+extern consvar_t cv_showmininames;
+
 typedef enum
 {
 	SKINMENUTYPE_SCROLL = 0,

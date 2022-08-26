@@ -1928,15 +1928,15 @@ static void ST_overlayDrawer(void)
 					strlcpy(name, player_names[stplyr-players], 13);*/
 
 					// Show name of player being displayed
-					V_DrawCenteredString((BASEVIDWIDTH/2), BASEVIDHEIGHT-40, 0, M_GetText("VIEWPOINT:"));
-					V_DrawCenteredString((BASEVIDWIDTH/2), BASEVIDHEIGHT-32, V_ALLOWLOWERCASE, player_names[stplyr-players]);
+					V_DrawCenteredString((BASEVIDWIDTH/2), BASEVIDHEIGHT-40, V_HUDTRANSHALF|V_YELLOWMAP|V_ALLOWLOWERCASE, M_GetText("Viewpoint:"));
+					V_DrawCenteredString((BASEVIDWIDTH/2), BASEVIDHEIGHT-32, V_HUDTRANSHALF|V_ALLOWLOWERCASE, player_names[stplyr-players]);
 				}
 			}
 			else if (!demo.title)
 			{
 				if (!splitscreen)
 				{
-					V_DrawCenteredString((BASEVIDWIDTH/2), BASEVIDHEIGHT-40, V_HUDTRANSHALF, M_GetText("VIEWPOINT:"));
+					V_DrawCenteredString((BASEVIDWIDTH/2), BASEVIDHEIGHT-40, V_HUDTRANSHALF|V_YELLOWMAP|V_ALLOWLOWERCASE, M_GetText("Viewpoint:"));
 					V_DrawCenteredString((BASEVIDWIDTH/2), BASEVIDHEIGHT-32, V_HUDTRANSHALF|V_ALLOWLOWERCASE, player_names[stplyr-players]);
 				}
 				else if (splitscreen == 1)
@@ -1944,7 +1944,7 @@ static void ST_overlayDrawer(void)
 					char name[MAXPLAYERNAME+12];
 
 					INT32 y = (stplyr == &players[displayplayers[0]]) ? 4 : BASEVIDHEIGHT/2-12;
-					sprintf(name, "VIEWPOINT: %s", player_names[stplyr-players]);
+					sprintf(name, "\x82Viewpoint:\x80 %s", player_names[stplyr-players]);
 					V_DrawRightAlignedThinString(BASEVIDWIDTH-40, y, V_HUDTRANSHALF|V_ALLOWLOWERCASE|K_calcSplitFlags(V_SNAPTOTOP|V_SNAPTOBOTTOM|V_SNAPTORIGHT), name);
 				}
 				else if (splitscreen)
@@ -2034,14 +2034,14 @@ static void ST_overlayDrawer(void)
 			{
 				INT32 splitflags = K_calcSplitFlags(0);
 				V_DrawThinString(2, (BASEVIDHEIGHT/2)-20, V_YELLOWMAP|V_HUDTRANSHALF|splitflags, M_GetText("- SPECTATING -"));
-				V_DrawThinString(2, (BASEVIDHEIGHT/2)-10, V_HUDTRANSHALF|splitflags, itemtxt);
+				V_DrawThinString(2, (BASEVIDHEIGHT/2)-10, V_HUDTRANSHALF|V_ALLOWLOWERCASE|splitflags, itemtxt);
 			}
 			else
 			{
 				V_DrawString(2, BASEVIDHEIGHT-40, V_HUDTRANSHALF|V_YELLOWMAP, M_GetText("- SPECTATING -"));
-				V_DrawString(2, BASEVIDHEIGHT-30, V_HUDTRANSHALF, itemtxt);
-				V_DrawString(2, BASEVIDHEIGHT-20, V_HUDTRANSHALF, M_GetText("Accelerate - Float"));
-				V_DrawString(2, BASEVIDHEIGHT-10, V_HUDTRANSHALF, M_GetText("Brake - Sink"));
+				V_DrawString(2, BASEVIDHEIGHT-30, V_HUDTRANSHALF|V_ALLOWLOWERCASE, itemtxt);
+				V_DrawString(2, BASEVIDHEIGHT-20, V_HUDTRANSHALF|V_ALLOWLOWERCASE, M_GetText("Accelerate - Float"));
+				V_DrawString(2, BASEVIDHEIGHT-10, V_HUDTRANSHALF|V_ALLOWLOWERCASE, M_GetText("Brake - Sink"));
 			}
 		}
 	}
