@@ -7476,7 +7476,7 @@ static void K_DrawKartPositionNum(INT32 num)
 	// POSI_X = BASEVIDWIDTH - 51;	// 269
 	// POSI_Y = BASEVIDHEIGHT- 64;	// 136
 
-	fixed_t scale = FRACUNIT;
+	fixed_t scale = FRACUNIT / 2;
 	patch_t *localpatch = kp_positionnum[0][0];
 
 	INT32 W = SHORT(kp_positionnum[0][0]->width);
