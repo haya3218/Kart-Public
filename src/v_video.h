@@ -198,6 +198,7 @@ void V_DrawCenteredThinString(INT32 x, INT32 y, INT32 option, const char *string
 void V_DrawRightAlignedThinString(INT32 x, INT32 y, INT32 option, const char *string);
 
 void V_DrawStringAtFixed(fixed_t x, fixed_t y, INT32 option, const char *string);
+void V_DrawSmallStringAtFixed(fixed_t x, fixed_t y, INT32 option, const char *string);
 
 // Draw tall nums, used for menu, HUD, intermission
 void V_DrawTallNum(INT32 x, INT32 y, INT32 flags, INT32 num);
@@ -224,6 +225,8 @@ INT32 V_ThinStringWidth(const char *string, INT32 option);
 void V_DoPostProcessor(INT32 view, postimg_t type, INT32 param);
 
 void V_DrawPatchFill(patch_t *pat);
+
+const char *V_ApproximateSkinColorCode(INT32 color);
 
 void VID_BlitLinearScreen(const UINT8 *srcptr, UINT8 *destptr, INT32 width, INT32 height, size_t srcrowbytes,
 	size_t destrowbytes);

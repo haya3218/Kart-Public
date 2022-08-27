@@ -7029,67 +7029,67 @@ static void K_drawKartItem(void)
 
 	if (stplyr->kartstuff[k_itemroulette])
 	{
-		if (stplyr->skincolor)
-			localcolor = stplyr->skincolor;
+		/*if (stplyr->skincolor)
+			localcolor = stplyr->skincolor;*/
 
 		switch((stplyr->kartstuff[k_itemroulette] % (14*3)) / 3)
 		{
 			// Each case is handled in threes, to give three frames of in-game time to see the item on the roulette
 			case 0: // Sneaker
 				localpatch = kp_sneaker[offset];
-				//localcolor = SKINCOLOR_RASPBERRY;
+				localcolor = SKINCOLOR_RASPBERRY;
 				break;
 			case 1: // Banana
 				localpatch = kp_banana[offset];
-				//localcolor = SKINCOLOR_YELLOW;
+				localcolor = SKINCOLOR_YELLOW;
 				break;
 			case 2: // Orbinaut
 				localpatch = kp_orbinaut[3+offset];
-				//localcolor = SKINCOLOR_STEEL;
+				localcolor = SKINCOLOR_STEEL;
 				break;
 			case 3: // Mine
 				localpatch = kp_mine[offset];
-				//localcolor = SKINCOLOR_JET;
+				localcolor = SKINCOLOR_JET;
 				break;
 			case 4: // Grow
 				localpatch = kp_grow[offset];
-				//localcolor = SKINCOLOR_TEAL;
+				localcolor = SKINCOLOR_TEAL;
 				break;
 			case 5: // Hyudoro
 				localpatch = kp_hyudoro[offset];
-				//localcolor = SKINCOLOR_STEEL;
+				localcolor = SKINCOLOR_STEEL;
 				break;
 			case 6: // Rocket Sneaker
 				localpatch = kp_rocketsneaker[offset];
-				//localcolor = SKINCOLOR_TANGERINE;
+				localcolor = SKINCOLOR_TANGERINE;
 				break;
 			case 7: // Jawz
 				localpatch = kp_jawz[offset];
-				//localcolor = SKINCOLOR_JAWZ;
+				localcolor = SKINCOLOR_JAWZ;
 				break;
 			case 8: // Self-Propelled Bomb
 				localpatch = kp_selfpropelledbomb[offset];
-				//localcolor = SKINCOLOR_JET;
+				localcolor = SKINCOLOR_JET;
 				break;
 			case 9: // Shrink
 				localpatch = kp_shrink[offset];
-				//localcolor = SKINCOLOR_ORANGE;
+				localcolor = SKINCOLOR_ORANGE;
 				break;
 			case 10: // Invincibility
 				localpatch = localinv;
-				//localcolor = SKINCOLOR_GREY;
+				localcolor = SKINCOLOR_GREY;
 				break;
 			case 11: // Eggman Monitor
 				localpatch = kp_eggman[offset];
-				//localcolor = SKINCOLOR_ROSE;
+				localcolor = SKINCOLOR_ROSE;
 				break;
 			case 12: // Ballhog
 				localpatch = kp_ballhog[offset];
-				//localcolor = SKINCOLOR_LILAC;
+				localcolor = SKINCOLOR_LILAC;
 				break;
 			case 13: // Thunder Shield
 				localpatch = kp_thundershield[offset];
-				//localcolor = SKINCOLOR_CYAN;
+				localcolor = SKINCOLOR_CYAN;
 				break;
 			/*case 14: // Pogo Spring
 				localpatch = kp_pogospring[offset];
@@ -7476,31 +7476,33 @@ static void K_DrawKartPositionNum(INT32 num)
 	// POSI_X = BASEVIDWIDTH - 51;	// 269
 	// POSI_Y = BASEVIDHEIGHT- 64;	// 136
 
-	boolean win = (stplyr->exiting && num == 1);
-	//INT32 X = POSI_X;
-	INT32 W = SHORT(kp_positionnum[0][0]->width);
 	fixed_t scale = FRACUNIT;
 	patch_t *localpatch = kp_positionnum[0][0];
-	//INT32 splitflags = K_calcSplitFlags(V_SNAPTOBOTTOM|V_SNAPTORIGHT);
+
+	INT32 W = SHORT(kp_positionnum[0][0]->width);
 	INT32 fx = 0, fy = 0, fflags = 0;
+	INT32 xoffs = (cv_showinput.value) ? -48 : 0;
+	
+	boolean win = (stplyr->exiting && num == 1);
 	boolean flipdraw = false;	// flip the order we draw it in for MORE splitscreen bs. fun.
 	boolean flipvdraw = false;	// used only for 2p splitscreen so overtaking doesn't make 1P's position fly off the screen.
 	boolean overtake = false;
 
 	if (stplyr->kartstuff[k_positiondelay] || stplyr->exiting)
 	{
-		scale *= 2;
+		scale = FRACUNIT;
 		overtake = true;	// this is used for splitscreen stuff in conjunction with flipdraw.
 	}
-	if (splitscreen)
-		scale /= 2;
+
+	/*if (splitscreen)
+		scale /= 2;*/
 
 	W = FixedMul(W<<FRACBITS, scale)>>FRACBITS;
 
 	// pain and suffering defined below
 	if (!splitscreen)
 	{
-		fx = POSI_X;
+		fx = POSI_X + xoffs;
 		fy = BASEVIDHEIGHT - 8;
 		fflags = V_SNAPTOBOTTOM|V_SNAPTORIGHT;
 	}
@@ -8231,7 +8233,18 @@ static void K_drawKartMinimapHead(mobj_t *mo, INT32 x, INT32 y, INT32 flags, pat
 			colormap = R_GetTranslationColormap(TC_RAINBOW, mo->color, GTC_CACHE);
 		else
 			colormap = R_GetTranslationColormap(skin, mo->color, GTC_CACHE);
-		V_DrawFixedPatch(amxpos, amypos, FRACUNIT, flags, facemmapprefix[skin], colormap);
+		
+		V_DrawFixedPatch(amxpos + (2 * FRACUNIT), amypos + (2 * FRACUNIT), FRACUNIT / 2, flags, facemmapprefix[skin], colormap);
+
+		if (cv_showminimapnames.value)
+		{
+			if (modeattacking || gamestate == GS_TIMEATTACK) // Don't show names on RA, due to ghosts.
+				return;
+
+			const char *player_name = va("%s%s", V_ApproximateSkinColorCode(mo->color), player_names[mo->player - players]);
+			V_DrawSmallStringAtFixed((amxpos + (4 * FRACUNIT)) - ((V_SmallStringWidth(player_name, V_ALLOWLOWERCASE|flags) / 2) << FRACBITS), amypos - (3 * FRACUNIT), V_ALLOWLOWERCASE|flags, player_name);
+		}
+		
 		if (mo->player
 			&& ((G_RaceGametype() && mo->player->kartstuff[k_position] == spbplace)
 			|| (G_BattleGametype() && K_IsPlayerWanted(mo->player))))
@@ -8701,6 +8714,9 @@ static void K_drawKartFirstPerson(void)
 // doesn't need to ever support 4p
 static void K_drawInput(void)
 {
+	if (!cv_showinput.value) // abort is showinput is disabled.
+		return;
+	
 	static INT32 pn = 0;
 	INT32 target = 0, splitflags = (V_SNAPTOBOTTOM|V_SNAPTORIGHT);
 	INT32 x = BASEVIDWIDTH - 32, y = BASEVIDHEIGHT-24, offs, col;
@@ -8870,12 +8886,12 @@ static void K_drawLapStartAnim(void)
 void K_drawKartFreePlay(UINT32 flashtime)
 {
 	// no splitscreen support because it's not FREE PLAY if you have more than one player in-game
+	INT32 flags = V_HUDTRANSHALF;
 
 	if ((flashtime % TICRATE) < TICRATE/2)
-		return;
+		flags = V_HUDTRANS;
 
-	V_DrawKartString((BASEVIDWIDTH - (LAPS_X+1)) - (12*9), // mirror the laps thingy
-		LAPS_Y+3, V_SNAPTOBOTTOM|V_SNAPTORIGHT|V_HUDTRANS, "FREE PLAY");
+	V_DrawCenteredString(160, 182, V_SNAPTOBOTTOM|V_YELLOWMAP|V_ALLOWLOWERCASE|flags, "Free Play");
 }
 
 static void K_drawDistributionDebugger(void)
@@ -9082,6 +9098,12 @@ void K_drawKartHUD(void)
 
 	if (!stplyr->spectator && !demo.freecam) // Bottom of the screen elements, don't need in spectate mode
 	{
+		if (!(splitscreen || demo.title))
+		{
+			if (LUA_HudEnabled(hud_position))
+				K_drawInput();
+		}
+
 		if (demo.title) // Draw title logo instead in demo.titles
 		{
 			INT32 x = BASEVIDWIDTH - 32, y = 128, offs;
@@ -9122,9 +9144,7 @@ void K_drawKartHUD(void)
 				K_drawKartSpeedometer();
 			}
 
-			if (isfreeplay)
-				;
-			else if (!modeattacking)
+			if (!(modeattacking || isfreeplay))
 			{
 				// Draw the numerical position
 #ifdef HAVE_BLUA
