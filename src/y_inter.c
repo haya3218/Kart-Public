@@ -401,7 +401,7 @@ void Y_IntermissionDrawer(void)
 		V_DrawFill((x-3) - duptweak, 182, dupadjust-2, 1, 0);
 
 		if (data.match.encore)
-			V_DrawCenteredString((-4 + x + BASEVIDWIDTH/2) - (V_SmallStringWidth("Encore Mode", V_ALLOWLOWERCASE) / 2), 17, hilicol|V_ALLOWLOWERCASE, "Encore Mode");
+			V_DrawSmallString((-4 + x + BASEVIDWIDTH/2) - (V_SmallStringWidth("Encore Mode", V_ALLOWLOWERCASE) / 2), 17, hilicol|V_ALLOWLOWERCASE, "Encore Mode");
 
 		if (data.match.numplayers > NUMFORNEWCOLUMN)
 		{
