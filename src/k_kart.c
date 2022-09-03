@@ -577,6 +577,7 @@ void K_RegisterKartStuff(void)
 	CV_RegisterVar(&cv_kartvoterulechanges);
 	CV_RegisterVar(&cv_kartgametypepreference);
 	CV_RegisterVar(&cv_kartspeedometer);
+	CV_RegisterVar(&cv_speedometerstyle);
 	CV_RegisterVar(&cv_kartvoices);
 	CV_RegisterVar(&cv_karteliminatelast);
 	CV_RegisterVar(&cv_votetime);
@@ -7913,22 +7914,50 @@ static void K_drawKartLaps(void)
 static void K_drawKartSpeedometer(void)
 {
 	fixed_t convSpeed;
+	const char *speedText = "";
 	INT32 splitflags = K_calcSplitFlags(V_SNAPTOBOTTOM|V_SNAPTOLEFT);
 
-	if (cv_kartspeedometer.value == 1) // Kilometers
+	if (cv_kartspeedometer.value == 0) // Don't.
+		return;
+
+	switch (cv_kartspeedometer.value)
 	{
-		convSpeed = FixedDiv(FixedMul(stplyr->speed, 142371), mapobjectscale)/FRACUNIT; // 2.172409058
-		V_DrawKartString(SPDM_X, SPDM_Y, V_HUDTRANS|splitflags, va("%3d km/h", convSpeed));
+		case 1: // Kilometers
+			convSpeed = FixedDiv(FixedMul(stplyr->speed, 142371), mapobjectscale) / FRACUNIT; // 2.172409058
+			speedText = "Km/h";
+			break;
+
+		case 2: // Miles
+			convSpeed = FixedDiv(FixedMul(stplyr->speed, 88465), mapobjectscale) / FRACUNIT; // 1.349868774
+			speedText = "Mph";
+			break;
+		
+		case 3: // Fracunits
+			convSpeed = FixedDiv(stplyr->speed, mapobjectscale) / FRACUNIT;
+			speedText = "Fu/t";
+			break;
+
+		case 4: // Percent
+			if (stplyr->mo)
+			{
+				convSpeed = (FixedDiv(stplyr->speed, FixedMul(K_GetKartSpeed(stplyr, false), ORIG_FRICTION)) * 100) >> FRACBITS;
+				speedText = (cv_speedometerstyle.value == 0) ? "P" : "%"; // Hate
+			}
+			break;
+
+		default:
+			break;
 	}
-	else if (cv_kartspeedometer.value == 2) // Miles
+
+	// Old...
+	if (cv_speedometerstyle.value == 0)
+		V_DrawKartString(SPDM_X, SPDM_Y, V_HUDTRANS|splitflags, va("%3d %s", convSpeed, speedText));
+
+	// New?
+	else if (cv_speedometerstyle.value == 1)
 	{
-		convSpeed = FixedDiv(FixedMul(stplyr->speed, 88465), mapobjectscale)/FRACUNIT; // 1.349868774
-		V_DrawKartString(SPDM_X, SPDM_Y, V_HUDTRANS|splitflags, va("%3d mph", convSpeed));
-	}
-	else if (cv_kartspeedometer.value == 3) // Fracunits
-	{
-		convSpeed = FixedDiv(stplyr->speed, mapobjectscale)/FRACUNIT;
-		V_DrawKartString(SPDM_X, SPDM_Y, V_HUDTRANS|splitflags, va("%3d fu/t", convSpeed));
+		V_DrawRankNum(SPDM_X + 28, SPDM_Y + 6, V_HUDTRANS|splitflags, convSpeed, 3, NULL);
+		V_DrawThinString(SPDM_X + 33, SPDM_Y + 5, V_HUDTRANS|V_ALLOWLOWERCASE|V_6WIDTHSPACE|V_YELLOWMAP|splitflags, speedText);
 	}
 }
 

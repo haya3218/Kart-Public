@@ -1450,34 +1450,35 @@ static menuitem_t OP_HUDOptionsMenu[] =
 	{IT_STRING | IT_CVAR, 				 NULL, "Show HUD",	 	   &cv_showhud,		    5},
 	{IT_STRING | IT_CVAR | IT_CV_SLIDER, NULL, "HUD Translucency", &cv_translucenthud, 10},
 
-	{IT_STRING | IT_CVAR | IT_CV_SLIDER, NULL, "Minimap Visibility",  &cv_kartminimap,	   20},
-	{IT_STRING | IT_CVAR, 				 NULL, "Speedometer Display", &cv_kartspeedometer, 25},
-	{IT_STRING | IT_CVAR, 				 NULL, "Input Display",		  &cv_showinput,	   30},
-	{IT_STRING | IT_CVAR, 				 NULL, "Show \"CHECK\"",	  &cv_kartcheck,	   35},
+	{IT_STRING | IT_CVAR, 				 NULL, "Show \"CHECK\"",	  &cv_kartcheck,	    20},
+	{IT_STRING | IT_CVAR | IT_CV_SLIDER, NULL, "Minimap Visibility",  &cv_kartminimap,	    25},
+	{IT_STRING | IT_CVAR, 				 NULL, "Input Display",		  &cv_showinput,	    30},
+	{IT_STRING | IT_CVAR, 				 NULL, "Speedometer Display", &cv_kartspeedometer,  35},
+	{IT_STRING | IT_CVAR, 				 NULL, "Speedometer Style",	  &cv_speedometerstyle, 40},
 
-	{IT_HEADER, NULL, "Console", NULL, 45},
+	{IT_HEADER, NULL, "Console", NULL, 50},
 
-	{IT_STRING | IT_CVAR, NULL,	"Menu Highlights",			&cons_menuhighlight,     50},
-	{IT_STRING | IT_CVAR, NULL, "Background Glass",			&cons_backcolor,		 55},
-	{IT_STRING | IT_CVAR, NULL,	"Console Text Size",		&cv_constextsize,		 60},
+	{IT_STRING | IT_CVAR, NULL,	"Menu Highlights",			&cons_menuhighlight,     55},
+	{IT_STRING | IT_CVAR, NULL, "Background Glass",			&cons_backcolor,		 60},
+	{IT_STRING | IT_CVAR, NULL,	"Console Text Size",		&cv_constextsize,		 65},
 
-	{IT_HEADER, NULL, "Online HUD", NULL, 70},
+	{IT_HEADER, NULL, "Online HUD", NULL, 75},
 
-	{IT_STRING | IT_CVAR, 				 NULL, "Chat Mode",			   &cv_consolechat,	 75},
-	{IT_STRING | IT_CVAR | IT_CV_SLIDER, NULL, "Chat Box Width",       &cv_chatwidth,	 80},
-	{IT_STRING | IT_CVAR | IT_CV_SLIDER, NULL, "Chat Box Height",	   &cv_chatheight,	 85},
-	{IT_STRING | IT_CVAR, 				 NULL, "Chat Background Tint", &cv_chatbacktint, 90},
+	{IT_STRING | IT_CVAR, 				 NULL, "Chat Mode",			   &cv_consolechat,	 80},
+	{IT_STRING | IT_CVAR | IT_CV_SLIDER, NULL, "Chat Box Width",       &cv_chatwidth,	 85},
+	{IT_STRING | IT_CVAR | IT_CV_SLIDER, NULL, "Chat Box Height",	   &cv_chatheight,	 90},
+	{IT_STRING | IT_CVAR, 				 NULL, "Chat Background Tint", &cv_chatbacktint, 95},
 
-	{IT_STRING | IT_CVAR, NULL, "Message Fadeout Time", &cv_chattime,			100},
-	{IT_STRING | IT_CVAR, NULL, "Spam Protection",	    &cv_chatspamprotection,	105},
+	{IT_STRING | IT_CVAR, NULL, "Message Fadeout Time", &cv_chattime,			105},
+	{IT_STRING | IT_CVAR, NULL, "Spam Protection",	    &cv_chatspamprotection,	110},
 
-	{IT_STRING | IT_CVAR, NULL, "Ping Measurement", 	&cv_pingmeasurement,    115},
-	{IT_STRING | IT_CVAR, NULL, "Local Ping display",   &cv_showping,	    	120},
+	{IT_STRING | IT_CVAR, NULL, "Ping Measurement", 	&cv_pingmeasurement,    120},
+	{IT_STRING | IT_CVAR, NULL, "Local Ping display",   &cv_showping,	    	125},
 
-	{IT_HEADER, NULL, "Miscelleanous", NULL, 130},
+	{IT_HEADER, NULL, "Miscelleanous", NULL, 135},
 
-	{IT_STRING | IT_CVAR, NULL,	  "Show Minimap Names",   &cv_showminimapnames, 135},
-	{IT_STRING | IT_CVAR, NULL,   "Show \"FOCUS LOST\"",  &cv_showfocuslost,    140},
+	{IT_STRING | IT_CVAR, NULL,	  "Show Minimap Names",   &cv_showminimapnames, 140},
+	{IT_STRING | IT_CVAR, NULL,   "Show \"FOCUS LOST\"",  &cv_showfocuslost,    145},
 };
 
 static menuitem_t OP_GameOptionsMenu[] =
