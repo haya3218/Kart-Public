@@ -577,7 +577,6 @@ void K_RegisterKartStuff(void)
 	CV_RegisterVar(&cv_kartvoterulechanges);
 	CV_RegisterVar(&cv_kartgametypepreference);
 	CV_RegisterVar(&cv_kartspeedometer);
-	CV_RegisterVar(&cv_speedometerstyle);
 	CV_RegisterVar(&cv_kartvoices);
 	CV_RegisterVar(&cv_karteliminatelast);
 	CV_RegisterVar(&cv_votetime);
@@ -8254,7 +8253,7 @@ static void K_drawKartMinimapHead(mobj_t *mo, INT32 x, INT32 y, INT32 flags, pat
 	}*/
 
 	if (!mo->color) // 'default' color
-		V_DrawSciencePatch(amxpos, amypos, flags, facemmapprefix[skin], FRACUNIT);
+		V_DrawSciencePatch(amxpos + (2 << FRACBITS), amypos + (2 << FRACBITS), flags, facemmapprefix[skin], FRACUNIT / 2);
 	else
 	{
 		UINT8 *colormap;
@@ -8263,7 +8262,7 @@ static void K_drawKartMinimapHead(mobj_t *mo, INT32 x, INT32 y, INT32 flags, pat
 		else
 			colormap = R_GetTranslationColormap(skin, mo->color, GTC_CACHE);
 		
-		V_DrawFixedPatch(amxpos + (2 * FRACUNIT), amypos + (2 * FRACUNIT), FRACUNIT / 2, flags, facemmapprefix[skin], colormap);
+		V_DrawFixedPatch(amxpos + (2 << FRACBITS), amypos + (2 << FRACBITS), FRACUNIT / 2, flags, facemmapprefix[skin], colormap);
 
 		if (cv_showminimapnames.value)
 		{
