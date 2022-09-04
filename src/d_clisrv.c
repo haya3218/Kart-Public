@@ -1934,6 +1934,7 @@ static void CL_LoadReceivedSavegame(void)
 static void SendAskInfo(INT32 node)
 {
 	const tic_t asktime = I_GetTime();
+
 	netbuffer->packettype = PT_ASKINFO;
 	netbuffer->u.askinfo.version = VERSION;
 	netbuffer->u.askinfo.time = (tic_t)LONG(asktime);
@@ -1946,7 +1947,7 @@ static void SendAskInfo(INT32 node)
 	if (node != 0 && node != BROADCASTADDR &&
 			cv_rendezvousserver.string[0])
 	{
-		I_NetRequestHolePunch();
+		I_NetRequestHolePunch(node);
 	}
 }
 
@@ -4334,6 +4335,11 @@ static void HandleConnect(SINT8 node)
 	// If a server filled out, then it'd overwrite the host and turn everyone into weird husks.....
 	// It's too much effort to legimately fix right now. Just prevent it from reaching that state.
 	UINT8 maxplayers = min((dedicated ? MAXPLAYERS-1 : MAXPLAYERS), cv_maxplayers.value);
+	UINT8 connectedplayers = 0;
+
+	for (UINT8 i = dedicated ? 1 : 0; i < MAXPLAYERS; i++)
+		if (playernode[i] != UINT8_MAX) // We use this to count players because it is affected by SV_AddWaitingPlayers when more than one client joins on the same tic, unlike playeringame and D_NumPlayers. UINT8_MAX denotes no node for that player
+			connectedplayers++;
 
 	if (bannednode && bannednode[node].banid != SIZE_MAX)
 	{
@@ -4391,7 +4397,7 @@ static void HandleConnect(SINT8 node)
 	{
 		SV_SendRefuse(node, M_GetText("The server is not accepting\njoins for the moment."));
 	}
-	else if (D_NumPlayers() >= maxplayers)
+	else if (connectedplayers >= maxplayers)
 	{
 		SV_SendRefuse(node, va(M_GetText("Maximum players reached: %d"), maxplayers));
 	}
@@ -4399,7 +4405,7 @@ static void HandleConnect(SINT8 node)
 	{
 		SV_SendRefuse(node, M_GetText("Too many players from\nthis node."));
 	}
-	else if (netgame && D_NumPlayers() + netbuffer->u.clientcfg.localplayers > maxplayers)
+	else if (netgame && connectedplayers + netbuffer->u.clientcfg.localplayers > maxplayers)
 	{
 		SV_SendRefuse(node, va(M_GetText("Number of local players\nwould exceed maximum: %d"), maxplayers));
 	}
