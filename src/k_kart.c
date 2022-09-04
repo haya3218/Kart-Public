@@ -6463,6 +6463,9 @@ static patch_t *kp_karmasticker;
 static patch_t *kp_splitkarmabomb;
 static patch_t *kp_timeoutsticker;
 
+static patch_t *skp_smallsticker;
+static patch_t *skp_speedpatches[5];
+
 static patch_t *kp_startcountdown[16];
 static patch_t *kp_racefinish[6];
 
@@ -6545,6 +6548,14 @@ void K_LoadKartHUDGraphics(void)
 	kp_karmasticker = 			W_CachePatchName("K_STKARM", PU_HUDGFX);
 	kp_splitkarmabomb = 		W_CachePatchName("K_SPTKRM", PU_HUDGFX);
 	kp_timeoutsticker = 		W_CachePatchName("K_STTOUT", PU_HUDGFX);
+
+	// Snowy patches
+	skp_smallsticker = 		    W_CachePatchName("SP_SMSTC", PU_HUDGFX);
+	skp_speedpatches[0] =		W_CachePatchName("K_TRNULL", PU_HUDGFX); // lolxd
+	skp_speedpatches[1] =		W_CachePatchName("SP_MMPH", PU_HUDGFX);
+	skp_speedpatches[2] =		W_CachePatchName("SP_MKMH", PU_HUDGFX);
+	skp_speedpatches[3] =		W_CachePatchName("SP_MFRAC", PU_HUDGFX);
+	skp_speedpatches[4] =		W_CachePatchName("SP_MPERC", PU_HUDGFX);
 
 	// Starting countdown
 	kp_startcountdown[0] = 		W_CachePatchName("K_CNT3A", PU_HUDGFX);
@@ -7912,52 +7923,42 @@ static void K_drawKartLaps(void)
 
 static void K_drawKartSpeedometer(void)
 {
-	fixed_t convSpeed;
-	const char *speedText = "";
-	INT32 splitflags = K_calcSplitFlags(V_SNAPTOBOTTOM|V_SNAPTOLEFT);
-
 	if (cv_kartspeedometer.value == 0) // Don't.
 		return;
+
+	fixed_t convSpeed;
+	UINT8 speed_patch = 0;
+	INT32 splitflags = K_calcSplitFlags(V_SNAPTOBOTTOM|V_SNAPTOLEFT);
 
 	switch (cv_kartspeedometer.value)
 	{
 		case 1: // Kilometers
 			convSpeed = FixedDiv(FixedMul(stplyr->speed, 142371), mapobjectscale) / FRACUNIT; // 2.172409058
-			speedText = "Km/h";
+			speed_patch = 1;
 			break;
 
 		case 2: // Miles
 			convSpeed = FixedDiv(FixedMul(stplyr->speed, 88465), mapobjectscale) / FRACUNIT; // 1.349868774
-			speedText = "Mph";
+			speed_patch = 2;
 			break;
 		
 		case 3: // Fracunits
 			convSpeed = FixedDiv(stplyr->speed, mapobjectscale) / FRACUNIT;
-			speedText = "Fu/t";
+			speed_patch = 3;
 			break;
 
 		case 4: // Percent
-			if (stplyr->mo)
-			{
-				convSpeed = (FixedDiv(stplyr->speed, FixedMul(K_GetKartSpeed(stplyr, false), ORIG_FRICTION)) * 100) >> FRACBITS;
-				speedText = (cv_speedometerstyle.value == 0) ? "P" : "%"; // Hate
-			}
+			convSpeed = (FixedDiv(stplyr->speed, FixedMul(K_GetKartSpeed(stplyr, false), ORIG_FRICTION)) * 100) >> FRACBITS;
+			speed_patch = 4;
 			break;
 
 		default:
 			break;
 	}
 
-	// Old...
-	if (cv_speedometerstyle.value == 0)
-		V_DrawKartString(SPDM_X, SPDM_Y, V_HUDTRANS|splitflags, va("%3d %s", convSpeed, speedText));
-
-	// New?
-	else if (cv_speedometerstyle.value == 1)
-	{
-		V_DrawRankNum(SPDM_X + 28, SPDM_Y + 6, V_HUDTRANS|splitflags, convSpeed, 3, NULL);
-		V_DrawThinString(SPDM_X + 33, SPDM_Y + 5, V_HUDTRANS|V_ALLOWLOWERCASE|V_6WIDTHSPACE|V_YELLOWMAP|splitflags, speedText);
-	}
+	V_DrawScaledPatch(SPDM_X + 1, SPDM_Y + 4, V_HUDTRANS|splitflags, skp_smallsticker);		
+	V_DrawRankNum(SPDM_X + 26, SPDM_Y + 4, V_HUDTRANS|splitflags, convSpeed, 3, NULL);
+	V_DrawScaledPatch(SPDM_X + 31, SPDM_Y + 4, V_HUDTRANS|splitflags, skp_speedpatches[speed_patch]);
 }
 
 static void K_drawKartBumpersOrKarma(void)
