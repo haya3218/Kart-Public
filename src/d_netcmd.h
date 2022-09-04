@@ -113,6 +113,8 @@ extern consvar_t cv_tripleorbinaut, cv_quadorbinaut, cv_dualjawz;
 extern consvar_t cv_kartminimap;
 extern consvar_t cv_kartcheck;
 extern consvar_t cv_kartinvinsfx;
+extern consvar_t cv_kartinvinmus;
+extern consvar_t cv_kartfinallap;
 extern consvar_t cv_kartspeed;
 extern consvar_t cv_kartbumpers;
 extern consvar_t cv_kartfrantic;

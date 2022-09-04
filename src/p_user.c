@@ -1277,25 +1277,25 @@ void P_RestoreMusic(player_t *player)
 		}
 
 		// Item - Grow
-		if (wantedmus == 2)
+		if (wantedmus == 2 && cv_kartinvinmus.value)
 		{
 			S_ChangeMusicInternal("kgrow", true);
 			S_SetRestoreMusicFadeInCvar(&cv_growmusicfade);
 		}
 		// Item - Invincibility
-		else if (wantedmus == 1)
+		else if (wantedmus == 1 && cv_kartinvinmus.value)
 		{
 			S_ChangeMusicInternal("kinvnc", true);
 			S_SetRestoreMusicFadeInCvar(&cv_invincmusicfade);
 		}
 		else
 		{
-#if 0
 			// Event - Final Lap
 			// Still works for GME, but disabled for consistency
-			if (G_RaceGametype() && player->laps >= (UINT8)(cv_numlaps.value - 1))
-				S_SpeedMusic(1.2f);
-#endif
+			/*
+			if (G_RaceGametype() && player->laps >= (UINT8)(cv_numlaps.value - 1) && cv_kartfinallap.value)
+				S_SpeedMusic(2.0f);
+				*/
 			if (mapmusresume && cv_resume.value)
 				position = mapmusresume;
 			else
@@ -7134,9 +7134,11 @@ consvar_t cv_cam4_speed = {"cam4_speed", "0.4", CV_FLOAT|CV_SAVE, CV_CamSpeed, N
 consvar_t cv_cam4_rotate = {"cam4_rotate", "0", CV_CALL|CV_NOINIT, CV_CamRotate, CV_CamRotate4_OnChange, 0, NULL, NULL, 0, 0, NULL};
 consvar_t cv_cam4_rotspeed = {"cam4_rotspeed", "10", CV_SAVE, rotation_cons_t, NULL, 0, NULL, NULL, 0, 0, NULL};
 
+CV_PossibleValue_t tiltsmooth_cons_t[] = {{1, "MIN"}, {255, "MAX"}, {0, NULL}};
+
 consvar_t cv_tilting = {"tilting", "On", CV_SAVE, CV_OnOff, NULL, 0, NULL, NULL, 0, 0, NULL};
 consvar_t cv_quaketilt = {"quaketilt", "On", CV_SAVE, CV_OnOff, NULL, 0, NULL, NULL, 0, 0, NULL};
-consvar_t cv_tiltsmoothing = {"tiltsmoothing", "32", CV_SAVE, CV_Natural, NULL, 0, NULL, NULL, 0, 0, NULL};
+consvar_t cv_tiltsmoothing = {"tiltsmoothing", "32", CV_SAVE, tiltsmooth_cons_t, NULL, 0, NULL, NULL, 0, 0, NULL};
 
 consvar_t cv_actionmovie = {"actionmovie", "On", CV_SAVE, CV_OnOff, NULL, 0, NULL, NULL, 0, 0, NULL};
 consvar_t cv_windowquake = {"windowquake", "Off", CV_SAVE, CV_OnOff, NULL, 0, NULL, NULL, 0, 0, NULL};

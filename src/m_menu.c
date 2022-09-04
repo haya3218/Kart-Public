@@ -1295,6 +1295,14 @@ static menuitem_t OP_VideoOptionsMenu[] =
 #ifdef HWRENDER
 	{IT_SUBMENU|IT_STRING,	NULL,	"OpenGL Options...",	&OP_OpenGLOptionsDef,	75},
 #endif
+
+	{IT_HEADER, NULL, "Crazy", NULL, 85},
+
+	{IT_STRING | IT_CVAR,	NULL,	"Camera Tilting",					&cv_tilting,	90},
+	{IT_STRING | IT_CVAR | IT_CV_SLIDER,	NULL,	"Tilt Smoothing",					&cv_tiltsmoothing,	95},
+	{IT_STRING | IT_CVAR,	NULL,	"Tilt While Turning",			&cv_quaketilt,	100},
+	{IT_STRING | IT_CVAR,	NULL,	"Also Tilt During Quakes",			&cv_actionmovie,	105},
+	{IT_STRING | IT_CVAR,	NULL,	"\x85" "Window Shaking During Quakes",		&cv_windowquake,	110},
 };
 
 enum
@@ -1362,16 +1370,29 @@ static menuitem_t OP_SoundOptionsMenu[] =
 	{IT_STRING|IT_CVAR,			NULL, "Chat Notifications",		&cv_chatnotifications,	 40},
 	{IT_STRING|IT_CVAR,			NULL, "Character voices",		&cv_kartvoices,			 45},
 	{IT_STRING|IT_CVAR,			NULL, "Powerup Warning",		&cv_kartinvinsfx,		 50},
+	{IT_STRING|IT_CVAR,			NULL, "Powerup Music",			&cv_kartinvinmus,		 55},
 
-	{IT_HEADER, NULL, "Miscelleanous", NULL, 60},
+	{IT_HEADER, NULL, "Fading", NULL, 65},
 
-	{IT_STRING|IT_CVAR,			NULL, "Reverse L/R Channels",	&stereoreverse,		 65},
-	{IT_STRING|IT_CVAR,			NULL, "Surround Sound",			&surround,			 70},
+	{IT_STRING | IT_CVAR, NULL, "Enable Fading",                 &cv_fading,                  70},
+	{IT_STRING | IT_CVAR, NULL, "Fade Back from Invincibility",  &cv_invincmusicfade,        75},
+	{IT_STRING | IT_CVAR, NULL, "Fade Back from Grow",           &cv_growmusicfade,          80},
+	{IT_STRING | IT_CVAR, NULL, "Fade Out Before Respawning",    &cv_respawnfademusicout,    85},
+	{IT_STRING | IT_CVAR, NULL, "Fade Back In While Respawning", &cv_respawnfademusicback,   90},
+
+	{IT_STRING | IT_CVAR, NULL, "Resync Threshold",          &cv_music_resync_threshold,     100},
+	{IT_STRING | IT_CVAR, NULL, "Resync Special Music Only", &cv_music_resync_powerups_only, 105},
+
+
+	{IT_HEADER, NULL, "Miscelleanous", NULL, 115},
+
+	{IT_STRING|IT_CVAR,			NULL, "Reverse L/R Channels",	&stereoreverse,		 120},
+	{IT_STRING|IT_CVAR,			NULL, "Surround Sound",			&surround,			 125},
 
 	// {IT_KEYHANDLER|IT_STRING,	NULL, "Sound Test",				M_HandleSoundTest,		110},
 
-	{IT_STRING|IT_CVAR,        NULL, "Play Music While Unfocused",  &cv_playmusicifunfocused, 80},
-	{IT_STRING|IT_CVAR,        NULL, "Play Sounds While Unfocused", &cv_playsoundifunfocused, 85},
+	{IT_STRING|IT_CVAR,        NULL, "Play Music While Unfocused",  &cv_playmusicifunfocused, 135},
+	{IT_STRING|IT_CVAR,        NULL, "Play Sounds While Unfocused", &cv_playsoundifunfocused, 140},
 };
 
 static menuitem_t OP_DataOptionsMenu[] =
