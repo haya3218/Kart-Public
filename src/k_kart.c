@@ -7948,8 +7948,11 @@ static void K_drawKartSpeedometer(void)
 			break;
 
 		case 4: // Percent
-			convSpeed = (FixedDiv(stplyr->speed, FixedMul(K_GetKartSpeed(stplyr, false), ORIG_FRICTION)) * 100) >> FRACBITS;
-			speed_patch = 4;
+			if (stplyr->mo)
+			{
+				convSpeed = (FixedDiv(stplyr->speed, FixedMul(K_GetKartSpeed(stplyr, false), ORIG_FRICTION)) * 100) >> FRACBITS;
+				speed_patch = 4;
+			}
 			break;
 
 		default:
