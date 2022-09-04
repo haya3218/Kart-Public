@@ -26,6 +26,9 @@
 #define ASSET_HASH_PATCH_KART    "00000000000000000000000000000000"
 #endif
 
+// Snowy do be cool
+#define ASSET_HASH_SNOWY_KART    "${SRB2_ASSET_snowy_files.kart_HASH}"
+
 #define SRB2_COMP_REVISION       "${SRB2_COMP_REVISION}"
 #define SRB2_COMP_BRANCH         "${SRB2_COMP_BRANCH}"
 
@@ -56,6 +59,9 @@
 #ifdef USE_PATCH_KART
 #define ASSET_HASH_PATCH_KART    "00000000000000000000000000000000"
 #endif
+
+// Snowy build's only and original file
+#define ASSET_HASH_SNOWY_KART    "e758ee17c81ff91dfa3b2d028cb2f781"
 
 #endif
 #endif
