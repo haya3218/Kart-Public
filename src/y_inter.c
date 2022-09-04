@@ -212,7 +212,7 @@ static void Y_CalculateMatchData(UINT8 rankingsmode, void (*comparison)(INT32))
 		;
 	else if ((data.match.rankingsmode = (boolean)rankingsmode))
 	{
-		sprintf(data.match.levelstring, "* Total Rankings *");
+		sprintf(data.match.levelstring, "\x82* \x80Total Rankings \x82*");
 		data.match.encore = false;
 	}
 	else
@@ -223,12 +223,12 @@ static void Y_CalculateMatchData(UINT8 rankingsmode, void (*comparison)(INT32))
 			if (mapheaderinfo[prevmap]->actnum[0])
 				snprintf(data.match.levelstring,
 					sizeof data.match.levelstring,
-					"* %s %s *",
+					"\x82*\x80 %s %s \x82*",
 					mapheaderinfo[prevmap]->lvlttl, mapheaderinfo[prevmap]->actnum);
 			else
 				snprintf(data.match.levelstring,
 					sizeof data.match.levelstring,
-					"* %s *",
+					"\x82*\x80 %s \x82*",
 					mapheaderinfo[prevmap]->lvlttl);
 		}
 		else
@@ -237,12 +237,12 @@ static void Y_CalculateMatchData(UINT8 rankingsmode, void (*comparison)(INT32))
 			if (mapheaderinfo[prevmap]->actnum[0])
 				snprintf(data.match.levelstring,
 					sizeof data.match.levelstring,
-					"* %s %s %s *",
+					"\x82*\x80 %s %s %s \x82*",
 					mapheaderinfo[prevmap]->lvlttl, zonttl, mapheaderinfo[prevmap]->actnum);
 			else
 				snprintf(data.match.levelstring,
 					sizeof data.match.levelstring,
-					"* %s %s *",
+					"\x82*\x80 %s %s \x82*",
 					mapheaderinfo[prevmap]->lvlttl, zonttl);
 		}
 
@@ -382,48 +382,7 @@ void Y_IntermissionDrawer(void)
 			x += (((16 - count) * vid.width) / (8 * vid.dupx));
 	}
 
-	// SRB2kart 290117 - compeltely replaced this block.
-	/*if (intertype == int_timeattack)
-	{
-		// draw time
-		ST_DrawPatchFromHud(HUD_TIME, sbotime);
-		if (cv_timetic.value)
-			ST_DrawNumFromHud(HUD_SECONDS, data.coop.tics);
-		else
-		{
-			INT32 seconds, minutes, tictrn;
-
-			seconds = G_TicsToSeconds(data.coop.tics);
-			minutes = G_TicsToMinutes(data.coop.tics, true);
-			tictrn  = G_TicsToCentiseconds(data.coop.tics);
-
-			ST_DrawNumFromHud(HUD_MINUTES, minutes); // Minutes
-			ST_DrawPatchFromHud(HUD_TIMECOLON, sbocolon); // Colon
-			ST_DrawPadNumFromHud(HUD_SECONDS, seconds, 2); // Seconds
-
-			// SRB2kart - pulled from old coop block, just in case we need it
-			// we should show centiseconds on the intermission screen too, if the conditions are right.
-			if (modeattacking || cv_timetic.value == 2)
-			{
-				ST_DrawPatchFromHud(HUD_TIMETICCOLON, sboperiod); // Period
-				ST_DrawPadNumFromHud(HUD_TICS, tictrn, 2); // Tics
-			}
-
-			ST_DrawPatchFromHud(HUD_TIMETICCOLON, sboperiod); // Period
-			ST_DrawPadNumFromHud(HUD_TICS, tictrn, 2); // Tics
-		}
-
-		// draw the "got through act" lines and act number
-		V_DrawLevelTitle(data.coop.passedx1, 49, 0, data.coop.passed1);
-		V_DrawLevelTitle(data.coop.passedx2, 49+V_LevelNameHeight(data.coop.passed2)+2, 0, data.coop.passed2);
-
-		if (strlen(mapheaderinfo[prevmap]->actnum) > 0)
-			V_DrawScaledPatch(244, 57, 0, data.coop.ttlnum);
-
-		//if (gottimebonus && endtic != -1)
-		//	V_DrawCenteredString(BASEVIDWIDTH/2, 172, V_YELLOWMAP, "TIME BONUS UNLOCKED!");
-	}
-	else*/ if (intertype == int_race || intertype == int_match)
+	if (intertype == int_race || intertype == int_match)
 	{
 #define NUMFORNEWCOLUMN 8
 		INT32 y = 41, gutter = ((data.match.numplayers > NUMFORNEWCOLUMN) ? 0 : (BASEVIDWIDTH/2));
@@ -436,16 +395,17 @@ void Y_IntermissionDrawer(void)
 			timeheader = (intertype == int_race ? "TIME" : "SCORE");
 
 		// draw the level name
-		V_DrawCenteredString(-4 + x + BASEVIDWIDTH/2, 12, 0, data.match.levelstring);
+		V_DrawCenteredString(-4 + x + BASEVIDWIDTH/2, 8, V_ALLOWLOWERCASE, data.match.levelstring);
+		
 		V_DrawFill((x-3) - duptweak, 34, dupadjust-2, 1, 0);
+		V_DrawFill((x-3) - duptweak, 182, dupadjust-2, 1, 0);
 
 		if (data.match.encore)
-			V_DrawCenteredString(-4 + x + BASEVIDWIDTH/2, 12-8, hilicol, "ENCORE MODE");
+			V_DrawSmallString((-4 + x + BASEVIDWIDTH/2) - (V_SmallStringWidth("Encore Mode", V_ALLOWLOWERCASE) / 2), 17, hilicol|V_ALLOWLOWERCASE, "Encore Mode");
 
 		if (data.match.numplayers > NUMFORNEWCOLUMN)
 		{
 			V_DrawFill(x+156, 24, 1, 158, 0);
-			V_DrawFill((x-3) - duptweak, 182, dupadjust-2, 1, 0);
 
 			V_DrawCenteredString(x+6+(BASEVIDWIDTH/2), 24, hilicol, "#");
 			V_DrawString(x+36+(BASEVIDWIDTH/2), 24, hilicol, "NAME");
@@ -564,23 +524,22 @@ dotimer:
 		INT32 tickdown = (timer+1)/TICRATE;
 
 		if (multiplayer && demo.playback)
-			string = va("Replay ends in %d", tickdown);
+			string = va("Replay ends in %d...", tickdown);
 		else
-			string = va("%s starts in %d", cv_advancemap.string, tickdown);
+			string = va("%s starts in %d...", cv_advancemap.string, tickdown);
 
-		V_DrawCenteredString(BASEVIDWIDTH/2, 188, hilicol,
-			string);
+		V_DrawCenteredString(BASEVIDWIDTH/2, 188, hilicol|V_ALLOWLOWERCASE, string);
 	}
 
 	if ((demo.recording || demo.savemode == DSM_SAVED) && !demo.playback)
 		switch (demo.savemode)
 		{
 		case DSM_NOTSAVING:
-			V_DrawRightAlignedThinString(BASEVIDWIDTH - 2, 2, V_SNAPTOTOP|V_SNAPTORIGHT|V_ALLOWLOWERCASE|hilicol, "Look Backward: Save replay");
+			V_DrawRightAlignedThinString(BASEVIDWIDTH - 2, 2, V_SNAPTOTOP|V_SNAPTORIGHT|V_ALLOWLOWERCASE|V_6WIDTHSPACE|hilicol, "Look Backward: Save replay");
 			break;
 
 		case DSM_SAVED:
-			V_DrawRightAlignedThinString(BASEVIDWIDTH - 2, 2, V_SNAPTOTOP|V_SNAPTORIGHT|V_ALLOWLOWERCASE|hilicol, "Replay saved!");
+			V_DrawRightAlignedThinString(BASEVIDWIDTH - 2, 2, V_SNAPTOTOP|V_SNAPTORIGHT|V_ALLOWLOWERCASE|V_6WIDTHSPACE|hilicol, "Replay saved!");
 			break;
 
 		case DSM_TITLEENTRY:
@@ -1023,7 +982,7 @@ void Y_VoteDrawer(void)
 
 		if (i == 3)
 		{
-			str = "RANDOM";
+			str = "Random";
 			pic = randomlvl;
 		}
 		else
@@ -1101,7 +1060,7 @@ void Y_VoteDrawer(void)
 				V_DrawFixedPatch((BASEVIDWIDTH-60)<<FRACBITS, ((y+25)<<FRACBITS) - (rubyheight<<1), FRACUNIT, V_SNAPTORIGHT, rubyicon, NULL);
 			}
 
-			V_DrawRightAlignedThinString(BASEVIDWIDTH-21, 40+y, V_SNAPTORIGHT|V_6WIDTHSPACE, str);
+			V_DrawRightAlignedThinString(BASEVIDWIDTH-21, 40+y, V_SNAPTORIGHT|V_ALLOWLOWERCASE|V_6WIDTHSPACE, str);
 
 			if (levelinfo[i].gts)
 			{
@@ -1110,7 +1069,7 @@ void Y_VoteDrawer(void)
 				V_DrawFill(BASEVIDWIDTH-100, y, w, 11, V_SNAPTORIGHT|levelinfo[i].gtc);
 				V_DrawDiag(BASEVIDWIDTH-100+w+1, y, 12, V_SNAPTORIGHT|31);
 				V_DrawDiag(BASEVIDWIDTH-100+w, y, 11, V_SNAPTORIGHT|levelinfo[i].gtc);
-				V_DrawThinString(BASEVIDWIDTH-99, y+1, V_SNAPTORIGHT, levelinfo[i].gts);
+				V_DrawThinString(BASEVIDWIDTH-99, y+1, V_SNAPTORIGHT|V_6WIDTHSPACE, levelinfo[i].gts);
 			}
 
 			y += 50;
@@ -1205,10 +1164,11 @@ void Y_VoteDrawer(void)
 			hilicol = cons_menuhighlight.value;
 		else if (gametype == GT_RACE)
 			hilicol = V_SKYMAP;
-		else //if (gametype == GT_MATCH)
+		else
 			hilicol = V_REDMAP;
-		V_DrawCenteredString(BASEVIDWIDTH/2, 188, hilicol,
-			va("Vote ends in %d", tickdown));
+		
+		V_DrawCenteredString(BASEVIDWIDTH/2, 188, hilicol|V_ALLOWLOWERCASE,
+			va("Vote ends in %d...", tickdown));
 	}
 }
 

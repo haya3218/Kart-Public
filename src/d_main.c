@@ -558,18 +558,16 @@ static void D_Display(void)
 	// vid size change is now finished if it was on...
 	vid.recalc = 0;
 
-	// FIXME: draw either console or menu, not the two
-	if (gamestate != GS_TIMEATTACK)
-		CON_Drawer();
-
 #ifdef HAVE_THREADS
 	I_lock_mutex(&m_menu_mutex);
 #endif
-	M_Drawer(); // menu is drawn even on top of everything
+	M_Drawer(); // menu is drawn even on top of everything (not really)
 #ifdef HAVE_THREADS
 	I_unlock_mutex(m_menu_mutex);
 #endif
 	// focus lost moved to M_Drawer
+
+	CON_Drawer();
 
 	//
 	// wipe update
@@ -1005,6 +1003,9 @@ static void IdentifyVersion(void)
 	D_AddFile(va(pandf,srb2waddir,"patch.kart"), startupwadfiles);
 #endif
 
+	// Jaden: XDLOL
+	D_AddFile(va(pandf,srb2waddir,"snowy_files.kart"), startupwadfiles);
+
 #if !defined (HAVE_SDL) || defined (HAVE_MIXER)
 #define MUSICTEST(str) \
 	{\
@@ -1314,6 +1315,10 @@ void D_SRB2Main(void)
 #ifdef USE_PATCH_KART
 	mainwads++; W_VerifyFileMD5(mainwads, ASSET_HASH_PATCH_KART);		// patch.kart
 #endif
+
+	// Jaden: File code is lol
+	mainwads++; W_VerifyFileMD5(mainwads, ASSET_HASH_SNOWY_KART);		// snowy_files.kart
+
 #else
 #ifdef USE_PATCH_DTA
 	mainwads++;	// patch.dta
