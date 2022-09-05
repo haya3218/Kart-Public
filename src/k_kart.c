@@ -7176,7 +7176,7 @@ static void K_drawKartItem(void)
 		}
 		else
 		{
-			if (stplyr->kartstuff[k_itemamount] <= 0)
+			if (stplyr->kartstuff[k_itemamount] <= 0 && stplyr->kartstuff[k_invincibilitytimer] <= 0)
 				return;
 
 			switch(stplyr->kartstuff[k_itemtype])
@@ -7236,7 +7236,8 @@ static void K_drawKartItem(void)
 					localpatch = kp_sadface[offset];
 					break;
 				default:
-					return;
+					localpatch = kp_nodraw;
+					break;
 			}
 
 			if (stplyr->kartstuff[k_itemheld] && !(leveltime & 1))
@@ -7335,6 +7336,9 @@ static void K_drawKartItem(void)
 	if (stplyr->kartstuff[k_eggmanexplode] > 1 /*&& stplyr->kartstuff[k_eggmanexplode] <= 3*TICRATE*/)
 		V_DrawScaledPatch(fx+17, fy+13-offset, V_HUDTRANS|fflags, kp_eggnum[min(3, G_TicsToSeconds(stplyr->kartstuff[k_eggmanexplode]))]);
 
+	// Powerup indicator
+	if (stplyr->kartstuff[k_invincibilitytimer] > 1 && stplyr->kartstuff[k_invincibilitytimer] < 3*TICRATE)
+		V_DrawScaledPatch(fx+17, fy+13-offset, V_HUDTRANS|fflags, kp_eggnum[min(2, G_TicsToSeconds(stplyr->kartstuff[k_invincibilitytimer]))+1]);
 }
 
 void K_drawKartTimestamp(tic_t drawtime, INT32 TX, INT32 TY, INT16 emblemmap, UINT8 mode)
@@ -7940,12 +7944,12 @@ static void K_drawKartSpeedometer(void)
 	{
 		case 1: // Kilometers
 			convSpeed = FixedDiv(FixedMul(stplyr->speed, 142371), mapobjectscale) / FRACUNIT; // 2.172409058
-			speed_patch = 1;
+			speed_patch = 2;
 			break;
 
 		case 2: // Miles
 			convSpeed = FixedDiv(FixedMul(stplyr->speed, 88465), mapobjectscale) / FRACUNIT; // 1.349868774
-			speed_patch = 2;
+			speed_patch = 1;
 			break;
 		
 		case 3: // Fracunits

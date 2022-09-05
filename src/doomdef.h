@@ -149,8 +149,8 @@ extern char  logfilename[1024];
 #else
 #define VERSION    1 // Game version
 #define SUBVERSION 4 // more precise version number
-#define VERSIONSTRING "v1.5 (Snowy Build)"
-#define VERSIONSTRINGW L"v1.5 (Snowy Build)"
+#define VERSIONSTRING "v1.5 (birdhouse-next)"
+#define VERSIONSTRINGW L"v1.5 (birdhouse-next)"
 // Hey! If you change this, add 1 to the MODVERSION below! Otherwise we can't force updates!
 // And change CMakeLists.txt (not src/, but in root), for CMake users!
 // AND appveyor.yml, for the build bots!
@@ -158,6 +158,9 @@ extern char  logfilename[1024];
 
 // Maintain compatibility with 1.0.x record attack replays?
 #define DEMO_COMPAT_100
+
+// Is this fork compatible with vanilla 1.5 servers?
+#define COMPATIBLE_150
 
 // Does this version require an added patch file?
 // Comment or uncomment this as necessary.
@@ -204,7 +207,10 @@ extern char  logfilename[1024];
 // it's only for detection of the version the player is using so the MS can alert them of an update.
 // Only set it higher, not lower, obviously.
 // Note that we use this to help keep internal testing in check; this is why v2.1.0 is not version "1".
-#define MODVERSION 10
+
+// haya: this has been bumped to 10 on `next`, but theres no gameplay changes afaik.
+// This will be set as 9 until further notice.
+#define MODVERSION 9
 
 // Filter consvars by version
 // To version config.cfg, MAJOREXECVERSION is set equal to MODVERSION automatically.

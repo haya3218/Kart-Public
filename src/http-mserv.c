@@ -52,7 +52,7 @@ consvar_t cv_masterserver_token = {
 	NULL, 0, NULL, NULL, 0, 0, NULL/* C90 moment */
 };
 
-#define HMS_QUERY_VERSION "?v=2.2"
+#define HMS_QUERY_VERSION "?v=2"
 
 #ifdef MASTERSERVER
 
