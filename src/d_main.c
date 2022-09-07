@@ -1000,7 +1000,7 @@ static void IdentifyVersion(void)
 	D_AddFile(va(pandf,srb2waddir,"chars.kart"), startupwadfiles);
 	D_AddFile(va(pandf,srb2waddir,"maps.kart"), startupwadfiles);
 #ifdef USE_PATCH_KART
-	//D_AddFile(va(pandf,srb2waddir,"patch.kart"), startupwadfiles);
+	D_AddFile(va(pandf,srb2waddir,"patch.kart"), startupwadfiles);
 #endif
 
 	// Jaden: XDLOL
@@ -1317,7 +1317,7 @@ void D_SRB2Main(void)
 	mainwads++; W_VerifyFileMD5(mainwads, ASSET_HASH_CHARS_KART);		// chars.kart
 	mainwads++; W_VerifyFileMD5(mainwads, ASSET_HASH_MAPS_KART);		// maps.kart -- 4 - If you touch this, make sure to touch up the majormods stuff below.
 #ifdef USE_PATCH_KART
-	mainwads++; W_VerifyFileMD5(mainwads, ASSET_HASH_PATCH_KART);		// patch.kart
+	//mainwads++; W_VerifyFileMD5(mainwads, ASSET_HASH_PATCH_KART);		// patch.kart
 #endif
 
 #else
