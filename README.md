@@ -15,6 +15,12 @@
     - [Just go to the base repo.](https://github.com/JadenArc/Snowy-Kart)
 - Small fixes related to some stuff.
 
+# Where?
+- Compile this repo. Just search for "srb2 compiling on google". It might vary for your system.
+- After compiling add these two files next to your srb2kart executable.
+    - [patch.kart](https://cdn.discordapp.com/attachments/845903070222614561/1016885923121725450/patch.kart)
+    - [extra.kart](https://cdn.discordapp.com/attachments/845903070222614561/1016885923339845773/extra.kart)
+
 ## Disclaimer
 - Kart Krew is in no way affiliated with SEGA or Sonic Team. We do not claim ownership of any of SEGA's intellectual property used in SRB2.
 - This build is based on Vanilla Kart, neither Moe-Mansion nor Birdhouse.

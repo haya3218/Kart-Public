@@ -1000,7 +1000,7 @@ static void IdentifyVersion(void)
 	D_AddFile(va(pandf,srb2waddir,"chars.kart"), startupwadfiles);
 	D_AddFile(va(pandf,srb2waddir,"maps.kart"), startupwadfiles);
 #ifdef USE_PATCH_KART
-	D_AddFile(va(pandf,srb2waddir,"patch.kart"), startupwadfiles);
+	//D_AddFile(va(pandf,srb2waddir,"patch.kart"), startupwadfiles);
 #endif
 
 	// Jaden: XDLOL
