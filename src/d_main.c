@@ -1004,7 +1004,7 @@ static void IdentifyVersion(void)
 #endif
 
 	// Jaden: XDLOL
-	D_AddFile(va(pandf,srb2waddir,"snowy_files.kart"), startupwadfiles);
+	//D_AddFile(va(pandf,srb2waddir,"snowy_files.kart"), startupwadfiles);
 
 	// This is Callmore's extra.wad file added here so that it automatically gets loaded on start
 	// No hash check; there may be some changes that will bork the exe.
@@ -1319,9 +1319,6 @@ void D_SRB2Main(void)
 #ifdef USE_PATCH_KART
 	mainwads++; W_VerifyFileMD5(mainwads, ASSET_HASH_PATCH_KART);		// patch.kart
 #endif
-
-	// Jaden: File code is lol
-	mainwads++; W_VerifyFileMD5(mainwads, ASSET_HASH_SNOWY_KART);		// snowy_files.kart
 
 #else
 #ifdef USE_PATCH_DTA

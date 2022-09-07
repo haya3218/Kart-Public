@@ -167,7 +167,7 @@ extern char  logfilename[1024];
 //#define USE_PATCH_DTA
 
 // Kart has it's own, as well.
-//#define USE_PATCH_KART
+#define USE_PATCH_KART
 
 // Use .kart extension addons
 #define USE_KART
