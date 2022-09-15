@@ -160,7 +160,8 @@ extern char  logfilename[1024];
 #define DEMO_COMPAT_100
 
 // Is this fork compatible with vanilla 1.5 servers?
-#define COMPATIBLE_150
+// nope
+//#define COMPATIBLE_150 
 
 // Does this version require an added patch file?
 // Comment or uncomment this as necessary.
