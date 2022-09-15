@@ -149,8 +149,8 @@ extern char  logfilename[1024];
 #else
 #define VERSION    1 // Game version
 #define SUBVERSION 4 // more precise version number
-#define VERSIONSTRING "v1.5 (birdhouse-next)"
-#define VERSIONSTRINGW L"v1.5 (birdhouse-next)"
+#define VERSIONSTRING "v1.5 (mpi-birdhouse)"
+#define VERSIONSTRINGW L"v1.5 (mpi-birdhouse)"
 // Hey! If you change this, add 1 to the MODVERSION below! Otherwise we can't force updates!
 // And change CMakeLists.txt (not src/, but in root), for CMake users!
 // AND appveyor.yml, for the build bots!
@@ -232,7 +232,7 @@ extern char  logfilename[1024];
 // The maximum number of players, multiplayer/networking.
 // NOTE: it needs more than this to increase the number of players...
 
-#define MAXPLAYERS 16
+#define MAXPLAYERS 32
 #define MAXSKINS 255
 #define PLAYERSMASK (MAXPLAYERS-1)
 #define MAXPLAYERNAME 21
