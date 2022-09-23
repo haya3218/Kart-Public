@@ -2917,6 +2917,8 @@ static void K_SpawnAIZDust(player_t *player)
 
 static void K_StretchPlayerGravity(player_t *p)
 {
+	return;
+	
     fixed_t mos = mapobjectscale;
     fixed_t rzs = abs(p->mo->momz);
     fixed_t zspd = abs(rzs/mos);
