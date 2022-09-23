@@ -149,8 +149,8 @@ extern char  logfilename[1024];
 #else
 #define VERSION    1 // Game version
 #define SUBVERSION 4 // more precise version number
-#define VERSIONSTRING "v1.5 (birdhouse-next)"
-#define VERSIONSTRINGW L"v1.5 (birdhouse-next)"
+#define VERSIONSTRING "v1.5 (bh-rollangle)"
+#define VERSIONSTRINGW L"v1.5 (bh-rollangle)"
 // Hey! If you change this, add 1 to the MODVERSION below! Otherwise we can't force updates!
 // And change CMakeLists.txt (not src/, but in root), for CMake users!
 // AND appveyor.yml, for the build bots!
