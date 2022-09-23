@@ -30,8 +30,12 @@ typedef struct gr_vissprite_s
 	struct gr_vissprite_s *next;
 	float x1, x2;
 	float z1, z2;
+	float gz, gzt;
 	float tz, ty;
+	float scale;
 	//lumpnum_t patchlumpnum;
+	float spritexscale, spriteyscale;
+	float spritexoffset, spriteyoffset;
 	GLPatch_t *gpatch;
 	boolean flip;
 	UINT8 translucency;       //alpha level 0-255

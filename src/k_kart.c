@@ -2915,6 +2915,166 @@ static void K_SpawnAIZDust(player_t *player)
 	}
 }
 
+static void K_StretchPlayerGravity(player_t *p)
+{
+    fixed_t mos = mapobjectscale;
+    fixed_t rzs = abs(p->mo->momz);
+    fixed_t zspd = abs(rzs/mos);
+	fixed_t stretchScaleFactor = 0;
+	fixed_t rzsDiv = 1;
+	fixed_t slamDiv = 1;
+
+    fixed_t dxs = p->mo->realxscale;
+    fixed_t dys = p->mo->realyscale;
+    //boolean gravSlamming = false;
+    //fixed_t impactFactor = 0;
+	stretchScaleFactor = FixedDiv(FRACUNIT*60, cv_gravstretch.value);
+
+	if (stretchScaleFactor > 17476977)
+		rzsDiv = 0;
+	else
+		rzsDiv = FixedDiv(rzs, stretchScaleFactor);
+
+	//CONS_Printf(M_GetText("div: %d, scale factor: %d, stretch value: %d\n"), rzsDiv, stretchScaleFactor, cv_gravstretch.value);
+
+
+    I_Assert(p != NULL);
+	I_Assert(p->mo != NULL);
+	I_Assert(!P_MobjWasRemoved(p->mo));
+
+    if (!P_IsObjectOnGround(p->mo))
+    {
+        if (zspd != 0)
+        {
+            if (((dxs-(rzsDiv))) > (dxs/5))
+            {
+                p->mo->spritexscale = ((dxs-(rzsDiv)));
+                p->mo->stretchslam = rzs;
+            }
+            else
+                p->mo->spritexscale = (dxs/5);
+
+            p->mo->spriteyscale = (dys+((rzsDiv*2)/3));
+        }
+        else
+        {
+            p->mo->spritexscale = (dxs);
+            p->mo->spriteyscale = (dys);
+        }
+    }
+    else
+    {
+		if (stretchScaleFactor > 17476977)
+			slamDiv = 0;
+		else
+			slamDiv = FixedDiv(p->mo->stretchslam, stretchScaleFactor);
+        p->mo->spritexscale = (dxs+(((slamDiv*2)/3)*2));
+        p->mo->spriteyscale = ((dys-(slamDiv)));
+        if (p->mo->stretchslam > 0)
+            p->mo->stretchslam -= (4*mos);
+        else
+            p->mo->stretchslam = 0;
+
+    }
+}
+
+static INT32 K_FindPlayerNum(player_t *plyr)
+{
+	INT32 i;
+	for(i = 0; i < 4; i++)
+	{
+		if (plyr == &players[displayplayers[i]])
+			return i;
+	}
+	return 0; // technically defaulting to player 1 but fuck it
+}
+
+static angle_t K_GetSlopeRollAngle(player_t *p, boolean dontflip, boolean useReserves)
+{
+	angle_t lookAngle = 0;
+	angle_t zangle = 0;
+	angle_t xydirection = 0;
+	angle_t an;
+	INT32 pNum = K_FindPlayerNum(p);
+	
+	I_Assert(p != NULL);
+	I_Assert(p->mo != NULL);
+	I_Assert(!P_MobjWasRemoved(p->mo));
+	
+	if (useReserves)
+	{
+		I_Assert(p->mo->reservezangle != NULL);
+		I_Assert(p->mo->reservexydir != NULL);
+	}
+
+	lookAngle = R_PointToAngle2(camera[pNum].x, camera[pNum].y, p->mo->x, p->mo->y);
+	
+
+	if (!R_PointToDist(p->mo->x, p->mo->y))
+		lookAngle = p->mo->angle;
+
+	if (!useReserves)
+	{
+		zangle = p->mo->standingslope->zangle;
+		xydirection = p->mo->standingslope->xydirection;
+
+    		p->mo->reservezangle = zangle;
+    		p->mo->reservexydir = xydirection;
+	}
+	else
+	{
+		if (p->mo->reservezangle)
+		{
+			zangle = p->mo->reservezangle;
+			xydirection = p->mo->reservexydir;
+		}
+	}
+
+	if ((p->mo->eflags & MFE_VERTICALFLIP) && (!dontflip))
+		zangle = InvAngle(zangle);
+
+	an = (lookAngle - xydirection);
+	return FixedMul(zangle, FINESINE(an>>ANGLETOFINESHIFT));
+}
+
+static void K_RollPlayerBySlopes(player_t *p, boolean usedistance) {
+	I_Assert(p->mo->subsector != NULL);
+	I_Assert(p->mo->subsector->sector != NULL);
+
+	INT32 pNum = K_FindPlayerNum(p);
+
+	fixed_t p_dist = R_PointToDist2(p->mo->x, p->mo->y, camera[pNum].x, camera[pNum].y);
+	fixed_t mos = mapobjectscale;
+	fixed_t rolldist = cv_sloperolldist.value*mos;
+
+	if (!P_IsObjectOnGround(p->mo))
+	{
+		if (!usedistance)
+			p->mo->sloperoll = K_GetSlopeRollAngle(p, false, true);
+		else if (p_dist <= (rolldist))
+			p->mo->sloperoll = K_GetSlopeRollAngle(p, false, true);
+		else
+			p->mo->sloperoll = FixedAngle(0);
+		
+		return;
+	}
+
+	if (!p->mo->standingslope)
+	{
+		p->mo->sloperoll = FixedAngle(0);
+		p->mo->reservezangle = FixedAngle(0);
+    	p->mo->reservexydir = FixedAngle(0);
+		return;
+	}
+
+	if (!usedistance)
+		p->mo->sloperoll = K_GetSlopeRollAngle(p, false, false);
+	else if (p_dist <= (rolldist))
+		p->mo->sloperoll = K_GetSlopeRollAngle(p, false, false);
+	else
+		p->mo->sloperoll = FixedAngle(0);
+}
+
 void K_SpawnBoostTrail(player_t *player)
 {
 	fixed_t newx;
@@ -6002,6 +6162,22 @@ void K_MoveKartPlayer(player_t *player, boolean onground)
 
 	K_KartDrift(player, onground);
 
+	if (cv_gravstretch.value > 13107)
+		K_StretchPlayerGravity(player);
+	else
+	{
+		player->mo->spritexscale = player->mo->realxscale;
+		player->mo->spriteyscale = player->mo->realyscale;
+	}
+	boolean usedist = false;
+	if (cv_sloperolldist.value > 0)
+		usedist = true;
+	if (cv_sloperoll.value == 1)
+		K_RollPlayerBySlopes(player, usedist);
+	else
+		player->mo->sloperoll = FixedAngle(0);
+	
+
 	// Quick Turning
 	// You can't turn your kart when you're not moving.
 	// So now it's time to burn some rubber!
@@ -7769,12 +7945,16 @@ void HU_DrawTabRankings(INT32 x, INT32 y, playersort_t *tab, INT32 scorelines, I
 	//this function is designed for 9 or less score lines only
 	//I_Assert(scorelines <= 9); -- not today bitch, kart fixed it up
 
+
+	//battleroyale: these adjustments to show more players courtesy of fickle from v1.1 battleroyale
 	V_DrawFill(1-duptweak, 26, dupadjust-2, 1, 0); // Draw a horizontal line because it looks nice!
 	if (scorelines > 8)
 	{
-		V_DrawFill(160, 26, 1, 147, 0); // Draw a vertical line to separate the two sides.
+		V_DrawFill(105, 26, 1, 147, 0); // Draw a vertical line to separate the two sides.
+		V_DrawFill(211, 26, 1, 147, 0); // Draw a vertical line to separate the two sides.
 		V_DrawFill(1-duptweak, 173, dupadjust-2, 1, 0); // And a horizontal line near the bottom.
-		rightoffset = (BASEVIDWIDTH/2) - 4 - x;
+		rightoffset = (BASEVIDWIDTH/3) - 4 - x;
+		x += 2;
 	}
 
 	for (i = 0; i < scorelines; i++)
@@ -7783,15 +7963,15 @@ void HU_DrawTabRankings(INT32 x, INT32 y, playersort_t *tab, INT32 scorelines, I
 
 		if (players[tab[i].num].spectator || !players[tab[i].num].mo)
 			continue; //ignore them.
-
+/*
 		if (netgame // don't draw it offline
 		&& tab[i].num != serverplayer)
 			HU_drawPing(x + ((i < 8) ? -17 : rightoffset + 11), y-4, playerpingtable[tab[i].num], 0);
-
+*/
 		STRBUFCPY(strtime, tab[i].name);
 
 		if (scorelines > 8)
-			V_DrawThinString(x + 20, y, ((tab[i].num == whiteplayer) ? hilicol : 0)|V_ALLOWLOWERCASE|V_6WIDTHSPACE, strtime);
+			V_DrawThinString(x + 12, y, ((tab[i].num == whiteplayer) ? hilicol : 0)|V_ALLOWLOWERCASE|V_6WIDTHSPACE, strtime);
 		else
 			V_DrawString(x + 20, y, ((tab[i].num == whiteplayer) ? hilicol : 0)|V_ALLOWLOWERCASE, strtime);
 
@@ -7802,8 +7982,11 @@ void HU_DrawTabRankings(INT32 x, INT32 y, playersort_t *tab, INT32 scorelines, I
 				colormap = R_GetTranslationColormap(TC_RAINBOW, players[tab[i].num].mo->color, GTC_CACHE);
 			else
 				colormap = R_GetTranslationColormap(players[tab[i].num].skin, players[tab[i].num].mo->color, GTC_CACHE);
-
-			V_DrawMappedPatch(x, y-4, 0, facerankprefix[players[tab[i].num].skin], colormap);
+			
+			if (scorelines > 8)
+				V_DrawFixedPatch((x+1)<<FRACBITS, (y+1)<<FRACBITS, FRACUNIT/2, 0, facerankprefix[players[tab[i].num].skin], colormap);
+			else
+				V_DrawMappedPatch(x, y-4, 0, facerankprefix[players[tab[i].num].skin], colormap);
 			/*if (G_BattleGametype() && players[tab[i].num].kartstuff[k_bumper] > 0) -- not enough space for this
 			{
 				INT32 bumperx = x+19;
@@ -7816,7 +7999,7 @@ void HU_DrawTabRankings(INT32 x, INT32 y, playersort_t *tab, INT32 scorelines, I
 			}*/
 		}
 
-		if (tab[i].num == whiteplayer)
+		if (scorelines <= 8 && tab[i].num == whiteplayer)
 			V_DrawScaledPatch(x, y-4, 0, kp_facehighlight[(leveltime / 4) % 8]);
 
 		if (G_BattleGametype() && players[tab[i].num].kartstuff[k_bumper] <= 0)
@@ -7824,10 +8007,15 @@ void HU_DrawTabRankings(INT32 x, INT32 y, playersort_t *tab, INT32 scorelines, I
 		else
 		{
 			INT32 pos = players[tab[i].num].kartstuff[k_position];
-			if (pos < 0 || pos > MAXPLAYERS)
-				pos = 0;
+			if (scorelines > 8)
+				V_DrawPingNum(x, y+2, 0, pos, NULL);
+			else if (pos < 0 || pos > 16)
+				V_DrawPingNum(x, y+6, 0, pos, NULL);
+			//if (pos < 0 || pos > MAXPLAYERS)
+				//pos = 0;
 			// Draws the little number over the face
-			V_DrawScaledPatch(x-5, y+6, 0, kp_facenum[pos]);
+			else
+				V_DrawScaledPatch(x-5, y+6, 0, kp_facenum[pos]);
 		}
 
 		if (G_RaceGametype())
@@ -7856,12 +8044,18 @@ void HU_DrawTabRankings(INT32 x, INT32 y, playersort_t *tab, INT32 scorelines, I
 		else
 			V_DrawRightAlignedString(x+rightoffset, y, 0, va("%u", tab[i].count));
 
-		y += 18;
+		y += (scorelines > 8) ? 10 : 18;
+		if (i == 13 || i == 27)
+		{
+			y = 29;
+			x += (BASEVIDWIDTH/3);
+		}
+/*		y += 18;
 		if (i == 7)
 		{
 			y = 33;
 			x = (BASEVIDWIDTH/2) + 4;
-		}
+		}*/
 	}
 }
 

@@ -1326,6 +1326,9 @@ void HWR_DrawMD2(gr_vissprite_t *spr)
 		p.rollangle = 0.0f;
 		p.rollflip = 1;
 		p.rotaxis = 0;
+
+		p.spritexscale = FIXED_TO_FLOAT(spr->mobj->spritexscale);
+		p.spriteyscale = FIXED_TO_FLOAT(spr->mobj->spriteyscale);
 		if (spr->mobj->rollangle)
 		{
 			fixed_t anglef = AngleFixed(spr->mobj->rollangle);
@@ -1334,8 +1337,8 @@ void HWR_DrawMD2(gr_vissprite_t *spr)
 			p.roll = true;
 
 			// rotation pivot
-			p.centerx = FIXED_TO_FLOAT(spr->mobj->radius/2);
-			p.centery = FIXED_TO_FLOAT(spr->mobj->height/2);
+			p.centerx = FIXED_TO_FLOAT(spr->mobj->radius/2)*(p.spritexscale);
+			p.centery = FIXED_TO_FLOAT(spr->mobj->height/2)*(p.spriteyscale);
 
 			// rotation axis
 			if (sprinfo->available)
@@ -1367,6 +1370,8 @@ void HWR_DrawMD2(gr_vissprite_t *spr)
 
 		// SRB2CBTODO: MD2 scaling support
 		finalscale *= FIXED_TO_FLOAT(interp.scale);
+
+		
 
 		p.flip = atransform.flip;
 #ifdef USE_FTRANSFORM_MIRROR

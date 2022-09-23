@@ -1830,6 +1830,10 @@ void R_RegisterEngineStuff(void)
 	CV_RegisterVar(&cv_cam4_rotate);
 	CV_RegisterVar(&cv_cam4_rotspeed);
 
+	CV_RegisterVar(&cv_gravstretch);
+	CV_RegisterVar(&cv_sloperoll);
+	CV_RegisterVar(&cv_sloperolldist);
+
 	CV_RegisterVar(&cv_tilting);
 	CV_RegisterVar(&cv_quaketilt);
 	CV_RegisterVar(&cv_tiltsmoothing);

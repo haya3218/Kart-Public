@@ -124,6 +124,11 @@ extern consvar_t cv_turnaxis3,cv_moveaxis3,cv_brakeaxis3,cv_aimaxis3,cv_lookaxis
 extern consvar_t cv_turnaxis4,cv_moveaxis4,cv_brakeaxis4,cv_aimaxis4,cv_lookaxis4,cv_fireaxis4,cv_driftaxis4,cv_lookbackaxis4,cv_xdeadzone4,cv_ydeadzone4;
 extern consvar_t cv_ghost_besttime, cv_ghost_bestlap, cv_ghost_last, cv_ghost_guest, cv_ghost_staff;
 
+extern consvar_t cv_driftsparkpulse;
+extern consvar_t cv_gravstretch;
+extern consvar_t cv_sloperoll;
+extern consvar_t cv_sloperolldist;
+
 extern consvar_t cv_invincmusicfade;
 extern consvar_t cv_growmusicfade;
 

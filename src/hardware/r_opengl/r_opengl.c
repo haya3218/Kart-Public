@@ -2873,18 +2873,62 @@ static void DrawModelEx(model_t *model, INT32 frameIndex, float duration, float 
 	static GLRGBAFloat tint = {0,0,0,0};
 	static GLRGBAFloat fade = {0,0,0,0};
 
+	const float radians = (float)(M_PIl / 180.0f);
 	float pol = 0.0f;
 	float scalex, scaley, scalez;
+	float sprxscale, spryscale;
+	float scalediffx, scalediffy;
+	int dfx, dfy;
+	float rollradian;
+	float scalecosx, scalesinx, scalecosy, scalesiny;
 
 	boolean useTinyFrames;
 
 	int i;
 
+	sprxscale = pos->spritexscale;
+	spryscale = pos->spriteyscale;
+
+	rollradian = 0;
+
+	if (pos->rollmodel == true)
+		rollradian = (pos->rollangle)*radians;
+
 	// Affect input model scaling
+
+	// this is hilariously insane but it's late as fuck and I can't be inclined to care
+	scalediffx = (sprxscale*scale) - scale;
+	scalediffy = (spryscale*scale) - scale;
+
 	scale *= 0.5f;
-	scalex = scale;
-	scaley = scale;
-	scalez = scale;
+
+	sprxscale *= 1.5f;
+	spryscale *= 1.5f;
+
+	scalediffx *= 0.5f;
+	scalediffy *= 0.5f;
+	
+
+	dfx = 1;
+	dfy = 1;
+
+	if (scalediffx < 0)
+		dfx = -1;
+	if (scalediffy < 0)
+		dfy = -1;
+
+
+	scalecosx = (fabs(scalediffx*cos(rollradian))*dfx);
+	scalesinx = (fabs(scalediffx*sin(rollradian))*dfx);
+
+
+	scalecosy = (fabs(scalediffy*sin(rollradian))*dfy);
+	scalesiny = (fabs(scalediffy*cos(rollradian))*dfy);
+
+	// "sprite accurate" model scaling, so that stretchy things don't look all that funky from any angle not the default
+	scalex = scale+scalecosx+scalecosy;
+	scaley = scale+scalesinx+scalesiny;
+	scalez = scale+scalecosx+scalecosy;
 
 	if (duration > 0.0 && tics >= 0.0) // don't interpolate if instantaneous or infinite in length
 	{

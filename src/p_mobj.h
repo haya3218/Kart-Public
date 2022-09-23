@@ -290,6 +290,17 @@ typedef struct mobj_s
 	UINT32 frame; // frame number, plus bits see p_pspr.h
 	UINT16 anim_duration; // for FF_ANIMATE states
 
+	UINT32 renderflags; // render flags
+	fixed_t spritexscale, spriteyscale;
+	fixed_t spritexoffset, spriteyoffset;
+
+	fixed_t realxscale, realyscale; // funn-E streeetch
+
+	fixed_t stretchslam; // "squish" effect when you land
+
+	//sloperollangle
+	angle_t sloperoll, reservezangle, reservexydir;
+
 	struct msecnode_s *touching_sectorlist; // a linked list of sectors where this object appears
 
 	struct subsector_s *subsector; // Subsector the mobj resides in.
@@ -413,6 +424,14 @@ typedef struct precipmobj_s
 	spritenum_t sprite; // used to find patch_t and flip value
 	UINT32 frame; // frame number, plus bits see p_pspr.h
 	UINT16 anim_duration; // for FF_ANIMATE states
+
+	UINT32 renderflags; // render flags
+	fixed_t spritexscale, spriteyscale;
+	fixed_t spritexoffset, spriteyoffset;
+
+	fixed_t realxscale, realyscale; // funn-E streeetch
+
+	fixed_t stretchslam; // "squish" effect when you land
 
 	struct mprecipsecnode_s *touching_sectorlist; // a linked list of sectors where this object appears
 

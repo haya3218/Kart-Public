@@ -37,6 +37,10 @@ enum mobj_e {
 	mobj_sprite,
 	mobj_frame,
 	mobj_anim_duration,
+	mobj_spritexscale,
+	mobj_spriteyscale,
+	mobj_spritexoffset,
+	mobj_spriteyoffset,
 	mobj_touching_sectorlist,
 	mobj_subsector,
 	mobj_floorz,
@@ -100,6 +104,10 @@ static const char *const mobj_opt[] = {
 	"sprite",
 	"frame",
 	"anim_duration",
+	"spritexscale",
+	"spriteyscale",
+	"spritexoffset",
+	"spriteyoffset",
 	"touching_sectorlist",
 	"subsector",
 	"floorz",
@@ -203,6 +211,18 @@ static int mobj_get(lua_State *L)
 		break;
 	case mobj_anim_duration:
 		lua_pushinteger(L, mo->anim_duration);
+		break;
+	case mobj_spritexscale:
+		lua_pushfixed(L, mo->realxscale);
+		break;
+	case mobj_spriteyscale:
+		lua_pushfixed(L, mo->realyscale);
+		break;
+	case mobj_spritexoffset:
+		lua_pushfixed(L, mo->spritexoffset);
+		break;
+	case mobj_spriteyoffset:
+		lua_pushfixed(L, mo->spriteyoffset);
 		break;
 	case mobj_touching_sectorlist:
 		return UNIMPLEMENTED;
@@ -444,6 +464,24 @@ static int mobj_set(lua_State *L)
 		break;
 	case mobj_anim_duration:
 		mo->anim_duration = (UINT16)luaL_checkinteger(L, 3);
+		break;
+	case mobj_spritexscale:
+		if (!mo->player)
+			mo->spritexscale = luaL_checkfixed(L, 3);
+		else
+			mo->realxscale = luaL_checkfixed(L, 3);
+		break;
+	case mobj_spriteyscale:
+		if (!mo->player)
+			mo->spriteyscale = luaL_checkfixed(L, 3);
+		else
+			mo->realyscale = luaL_checkfixed(L, 3);
+		break;
+	case mobj_spritexoffset:
+		mo->spritexoffset = luaL_checkfixed(L, 3);
+		break;
+	case mobj_spriteyoffset:
+		mo->spriteyoffset = luaL_checkfixed(L, 3);
 		break;
 	case mobj_touching_sectorlist:
 		return UNIMPLEMENTED;

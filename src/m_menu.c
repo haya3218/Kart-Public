@@ -309,6 +309,7 @@ menu_t OP_VideoOptionsDef, OP_VideoModeDef;
 #ifdef HWRENDER
 menu_t OP_OpenGLOptionsDef, OP_OpenGLColorDef;
 #endif
+menu_t OP_PlayerDistortDef;
 menu_t OP_SoundOptionsDef;
 //static void M_RestartAudio(void);
 
@@ -1293,9 +1294,10 @@ static menuitem_t OP_VideoOptionsMenu[] =
 
 	{IT_STRING | IT_CVAR,	NULL,	"Show FPS",				&cv_ticrate,			 60},
 	{IT_STRING | IT_CVAR,   NULL,   "FPS Cap",              &cv_fpscap,              65},
+	{IT_SUBMENU|IT_STRING,	NULL,	"Player distortion...", &OP_PlayerDistortDef,	70},
 
 #ifdef HWRENDER
-	{IT_SUBMENU|IT_STRING,	NULL,	"OpenGL Options...",	&OP_OpenGLOptionsDef,	75},
+	{IT_SUBMENU|IT_STRING,	NULL,	"OpenGL Options...",	&OP_OpenGLOptionsDef,	80},
 #endif
 
 	{IT_HEADER, NULL, "Crazy", NULL, 85},
@@ -1320,6 +1322,7 @@ enum
 	op_video_fov,
 	op_video_fps,
 	op_video_fpscap,
+	op_video_gravstretch,
 #ifdef HWRENDER
 	op_video_ogl,
 #endif
@@ -1356,6 +1359,21 @@ static menuitem_t OP_OpenGLColorMenu[] =
 	{IT_STRING|IT_CVAR|IT_CV_SLIDER, NULL, "Blue",  &cv_grgammablue,  30},
 };
 #endif
+
+static menuitem_t OP_PlayerDistortMenu[] =
+{
+	{IT_HEADER, NULL, "Player Distortion", NULL, 0},
+	{IT_STRING | IT_CVAR, 	NULL, 	"Rotate players on slopes", &cv_sloperoll, 	10},
+	{IT_STRING | IT_CVAR, 	NULL, 	"Slope rotation distance",&cv_sloperolldist,20},
+	{IT_STRING | IT_CVAR,	NULL,	"Player stretch factor",	&cv_gravstretch,30},
+};
+
+enum
+{
+	sloperotate,
+	slrotatedist,
+	stretchyplayer,
+};
 
 static menuitem_t OP_SoundOptionsMenu[] =
 {
@@ -2133,6 +2151,7 @@ menu_t OP_MonitorToggleDef =
 
 #ifdef HWRENDER
 menu_t OP_OpenGLOptionsDef = DEFAULTMENUSTYLE("M_VIDEO", OP_OpenGLOptionsMenu, &OP_VideoOptionsDef, 30, 30);
+
 menu_t OP_OpenGLColorDef =
 {
 	"M_VIDEO",
@@ -2145,6 +2164,7 @@ menu_t OP_OpenGLColorDef =
 	NULL
 };
 #endif
+menu_t OP_PlayerDistortDef = DEFAULTMENUSTYLE("M_VIDEO", OP_PlayerDistortMenu, &OP_VideoOptionsDef, 30, 60);
 menu_t OP_DataOptionsDef = DEFAULTMENUSTYLE("M_DATA", OP_DataOptionsMenu, &OP_MainDef, 60, 30);
 menu_t OP_ScreenshotOptionsDef = DEFAULTMENUSTYLE("M_SCSHOT", OP_ScreenshotOptionsMenu, &OP_DataOptionsDef, 30, 30);
 menu_t OP_AddonsOptionsDef = DEFAULTMENUSTYLE("M_ADDONS", OP_AddonsOptionsMenu, &OP_DataOptionsDef, 30, 30);
@@ -2399,6 +2419,22 @@ void Addons_option_Onchange(void)
 {
 	OP_AddonsOptionsMenu[op_addons_folder].status =
 		(cv_addons_option.value == 3 ? IT_CVAR|IT_STRING|IT_CV_STRING : IT_DISABLED);
+}
+
+void PDistort_menu_Onchange(void)
+{
+	UINT16 status;
+
+	if (cv_sloperoll.value)
+	{
+		status = IT_STRING | IT_CVAR;
+	}
+	else
+	{
+		status = IT_GRAYEDOUT;
+	}
+
+	OP_PlayerDistortMenu[2].status = status;
 }
 
 // ==========================================================================

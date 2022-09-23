@@ -108,7 +108,8 @@ typedef enum
 {
 	SC_NONE = 0,
 	SC_TOP = 1,
-	SC_BOTTOM = 2
+	SC_BOTTOM = 2,
+	SC_VFLIP = 3
 } spritecut_e;
 
 // A vissprite_t is a thing that will be drawn during a refresh,
@@ -119,7 +120,7 @@ typedef struct vissprite_s
 	struct vissprite_s *prev;
 	struct vissprite_s *next;
 
-	mobj_t *mobj; // for easy access
+	mobj_t *mobj; // for easy access4
 
 	INT32 x1, x2;
 
@@ -128,9 +129,19 @@ typedef struct vissprite_s
 	fixed_t pz, pzt; // physical bottom/top for sorting with 3D floors
 
 	fixed_t startfrac; // horizontal position of x1
-	fixed_t scale, sortscale; // sortscale only differs from scale for flat sprites
+	fixed_t xscale, scale; // projected horizontal and vertical scales
+	fixed_t thingscale; // the object's scale
+	fixed_t sortscale; // sortscale only differs from scale for flat sprites
 	fixed_t scalestep; // only for flat sprites, 0 otherwise
+	fixed_t paperoffset, paperdistance; // for paper sprites, offset/dist relative to the angle
 	fixed_t xiscale; // negative if flipped
+
+	angle_t centerangle; // for paper sprites
+
+	struct {
+		fixed_t tan; // The amount to shear the sprite vertically per row
+		INT32 offset; // The center of the shearing location offset from x1
+	} shear;
 
 	fixed_t texturemid;
 	patch_t *patch;
@@ -146,7 +157,7 @@ typedef struct vissprite_s
 
 	extracolormap_t *extra_colormap; // global colormaps
 
-	fixed_t xscale;
+	//fixed_t xscale;
 
 	// Precalculated top and bottom screen coords for the sprite.
 	fixed_t thingheight; // The actual height of the thing (for 3D floors)
@@ -154,6 +165,11 @@ typedef struct vissprite_s
 	INT16 sz, szt;
 
 	spritecut_e cut;
+	UINT32 renderflags;
+
+	fixed_t spritexscale, spriteyscale;
+	fixed_t spritexoffset, spriteyoffset;
+
 
 	INT16 clipbot[MAXVIDWIDTH], cliptop[MAXVIDWIDTH];
 
@@ -161,8 +177,6 @@ typedef struct vissprite_s
 	boolean vflip; // Flip vertically
 	boolean isScaled;
 	INT32 dispoffset; // copy of info->dispoffset, affects ordering but not drawing
-
-	fixed_t thingscale;
 } vissprite_t;
 
 extern UINT32 visspritecount;

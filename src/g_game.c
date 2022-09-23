@@ -531,6 +531,23 @@ consvar_t cv_lookbackaxis4 = {"joyaxis4_lookback", "None", CV_SAVE, joyaxis_cons
 consvar_t cv_xdeadzone4 = {"joy4_xdeadzone", "0.3", CV_FLOAT|CV_SAVE, deadzone_cons_t, NULL, 0, NULL, NULL, 0, 0, NULL};
 consvar_t cv_ydeadzone4 = {"joy4_ydeadzone", "0.5", CV_FLOAT|CV_SAVE, deadzone_cons_t, NULL, 0, NULL, NULL, 0, 0, NULL};
 
+static CV_PossibleValue_t driftsparkpulse_t[] = {{0, "MIN"}, {FRACUNIT*3, "MAX"}, {0, NULL}};
+consvar_t cv_driftsparkpulse = {"driftsparkpulse", "1.4", CV_FLOAT | CV_SAVE, driftsparkpulse_t, NULL, 0, NULL, NULL, 0, 0, NULL};
+
+static CV_PossibleValue_t stretchfactor_t[] = {{FRACUNIT/5, "MIN"}, {FRACUNIT, "MAX"}, {0, NULL}};
+consvar_t cv_gravstretch = {"gravstretch", "1", CV_FLOAT | CV_SAVE, stretchfactor_t, NULL, 0, NULL, NULL, 0, 0, NULL};
+
+consvar_t cv_sloperoll = {"sloperoll", "Off", CV_SAVE|CV_CALL, CV_OnOff, PDistort_menu_Onchange, 0, NULL, NULL, 0, 0, NULL};
+
+static CV_PossibleValue_t sloperolldist_cons_t[] = {
+	/*{256, "256"},*/	{512, "512"},	{768, "768"},
+	{1024, "1024"},	{1536, "1536"},	{2048, "2048"},
+	{3072, "3072"},	{4096, "4096"},	{6144, "6144"},
+	{8192, "8192"},	{0, "Infinite"},	{0, NULL}};
+consvar_t cv_sloperolldist = {"sloperolldist", "Infinite", CV_SAVE, sloperolldist_cons_t, NULL, 0, NULL, NULL, 0, 0, NULL};
+
+
+
 consvar_t cv_invincmusicfade = {"invincmusicfade", "300", CV_SAVE, CV_Unsigned, NULL, 0, NULL, NULL, 0, 0, NULL};
 consvar_t cv_growmusicfade = {"growmusicfade", "500", CV_SAVE, CV_Unsigned, NULL, 0, NULL, NULL, 0, 0, NULL};
 
