@@ -34,6 +34,7 @@ enum mobj_e {
 	mobj_sprev,
 	mobj_angle,
 	mobj_rollangle,
+	mobj_sloperoll,
 	mobj_sprite,
 	mobj_frame,
 	mobj_anim_duration,
@@ -101,6 +102,7 @@ static const char *const mobj_opt[] = {
 	"sprev",
 	"angle",
 	"rollangle",
+	"sloperoll",
 	"sprite",
 	"frame",
 	"anim_duration",
@@ -202,6 +204,9 @@ static int mobj_get(lua_State *L)
 		break;
 	case mobj_rollangle:
 		lua_pushangle(L, mo->rollangle);
+		break;
+	case mobj_sloperoll:
+		lua_pushangle(L, mo->sloperoll); // read-only: get the player's slope roll angle
 		break;
 	case mobj_sprite:
 		lua_pushinteger(L, mo->sprite);
