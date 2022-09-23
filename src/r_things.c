@@ -143,11 +143,10 @@ static void R_InstallSpriteLump(UINT16 wad,            // graphics patch
 
 // rotsprite
 #ifdef ROTSPRITE
-	sprtemp[frame].rotsprite.cached = 0;
 	for (r = 0; r < 16; r++)
 	{
-		for (ang = 0; ang < ROTANGLES; ang++)
-			sprtemp[frame].rotsprite.patch[r][ang] = NULL;
+		sprtemp[frame].rotated[0][r] = NULL;
+		sprtemp[frame].rotated[1][r] = NULL;
 	}
 #endif/*ROTSPRITE*/
 
@@ -261,9 +260,6 @@ static boolean R_AddSingleSpriteDef(const char *sprname, spritedef_t *spritedef,
 	// if so, it might patch only certain frames, not all
 	if (spritedef->numframes) // (then spriteframes is not null)
 	{
-#ifdef ROTSPRITE
-		R_FreeSingleRotSprite(spritedef);
-#endif
 		// copy the already defined sprite frames
 		M_Memcpy(sprtemp, spritedef->spriteframes,
 		 spritedef->numframes * sizeof (spriteframe_t));
@@ -399,9 +395,6 @@ static boolean R_AddSingleSpriteDef(const char *sprname, spritedef_t *spritedef,
 	if (spritedef->numframes &&             // has been allocated
 		spritedef->numframes < maxframe)   // more frames are defined ?
 	{
-#ifdef ROTSPRITE
-		R_FreeSingleRotSprite(spritedef);
-#endif
 		Z_Free(spritedef->spriteframes);
 		spritedef->spriteframes = NULL;
 	}
@@ -1282,7 +1275,7 @@ static void R_ProjectSprite(mobj_t *thing)
 	{
 		sprdef = &((skin_t *)thing->skin)->spritedef;
 #ifdef ROTSPRITE
-		sprinfo = NULL;
+		sprinfo = &spriteinfo[thing->sprite];
 #endif
 
 		if (rot >= sprdef->numframes)
@@ -1292,7 +1285,7 @@ static void R_ProjectSprite(mobj_t *thing)
 	{
 		sprdef = &sprites[thing->sprite];
 #ifdef ROTSPRITE
-		sprinfo = NULL;
+		sprinfo = &spriteinfo[thing->sprite];
 #endif
 	}
 
@@ -1303,6 +1296,9 @@ static void R_ProjectSprite(mobj_t *thing)
 		thing->sprite = states[S_UNKNOWN].sprite;
 		thing->frame = states[S_UNKNOWN].frame;
 		sprdef = &sprites[thing->sprite];
+#ifdef ROTSPRITE
+		sprinfo = &spriteinfo[thing->sprite];
+#endif
 		rot = thing->frame&FF_FRAMEMASK;
 		if (!thing->skin)
 		{
@@ -1364,15 +1360,16 @@ static void R_ProjectSprite(mobj_t *thing)
 	{
 		rollsum = (thing->rollangle)+(thing->sloperoll);
 		rollangle = R_GetRollAngle(rollsum);
-		if (!(sprframe->rotsprite.cached & (1<<rot)))
-			R_CacheRotSprite(thing->sprite, (thing->frame & FF_FRAMEMASK), sprinfo, sprframe, rot, flip);
-		rotsprite = sprframe->rotsprite.patch[rot][rollangle];
+		rotsprite = Patch_GetRotatedSprite(sprframe, (thing->frame & FF_FRAMEMASK), rot, flip, sprinfo, rollangle);
+
 		if (rotsprite != NULL)
 		{
 			spr_width = rotsprite->width << FRACBITS;
 			spr_height = rotsprite->height << FRACBITS;
 			spr_offset = rotsprite->leftoffset << FRACBITS;
 			spr_topoffset = rotsprite->topoffset << FRACBITS;
+			spr_topoffset += FEETADJUST;
+
 			// flip -> rotate, not rotate -> flip
 			flip = 0;
 		}

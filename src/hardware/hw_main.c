@@ -4211,9 +4211,19 @@ void HWR_ProjectSprite(mobj_t *thing)
 
 	//Fab : 02-08-98: 'skin' override spritedef currently used for skin
 	if (thing->skin && thing->sprite == SPR_PLAY)
+	{
 		sprdef = &((skin_t *)thing->skin)->spritedef;
+#ifdef ROTSPRITE
+		sprinfo = &spriteinfo[thing->sprite];
+#endif
+	}
 	else
+	{
 		sprdef = &sprites[thing->sprite];
+#ifdef ROTSPRITE
+		sprinfo = &spriteinfo[thing->sprite];
+#endif
+	}
 
 	if (rot >= sprdef->numframes)
 	{
@@ -4222,6 +4232,9 @@ void HWR_ProjectSprite(mobj_t *thing)
 		thing->sprite = states[S_UNKNOWN].sprite;
 		thing->frame = states[S_UNKNOWN].frame;
 		sprdef = &sprites[thing->sprite];
+#ifdef ROTSPRITE
+		sprinfo = &spriteinfo[thing->sprite];
+#endif
 		rot = thing->frame&FF_FRAMEMASK;
 		thing->state->sprite = thing->sprite;
 		thing->state->frame = thing->frame;
@@ -4287,15 +4300,16 @@ void HWR_ProjectSprite(mobj_t *thing)
 	{
 		rollsum = (thing->rollangle)+(thing->sloperoll);
 		rollangle = R_GetRollAngle(rollsum);
-		if (!(sprframe->rotsprite.cached & (1<<rot)))
-			R_CacheRotSprite(thing->sprite, (thing->frame & FF_FRAMEMASK), sprinfo, sprframe, rot, flip);
-		rotsprite = sprframe->rotsprite.patch[rot][rollangle];
+		rotsprite = Patch_GetRotatedSprite(sprframe, (thing->frame & FF_FRAMEMASK), rot, flip, sprinfo, rollangle);
+
 		if (rotsprite != NULL)
 		{
 			spr_width = rotsprite->width << FRACBITS;
 			spr_height = rotsprite->height << FRACBITS;
 			spr_offset = rotsprite->leftoffset << FRACBITS;
 			spr_topoffset = rotsprite->topoffset << FRACBITS;
+			spr_topoffset += FEETADJUST;
+
 			// flip -> rotate, not rotate -> flip
 			flip = 0;
 		}
