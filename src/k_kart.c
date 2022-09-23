@@ -6162,13 +6162,8 @@ void K_MoveKartPlayer(player_t *player, boolean onground)
 
 	K_KartDrift(player, onground);
 
-	if (cv_gravstretch.value > 13107)
-		K_StretchPlayerGravity(player);
-	else
-	{
-		player->mo->spritexscale = player->mo->realxscale;
-		player->mo->spriteyscale = player->mo->realyscale;
-	}
+	player->mo->spritexscale = player->mo->realxscale;
+	player->mo->spriteyscale = player->mo->realyscale;
 	boolean usedist = false;
 	if (cv_sloperolldist.value > 0)
 		usedist = true;
