@@ -132,11 +132,16 @@ typedef struct
 	FLOAT       anglex,angley;   // aimingangle / viewangle
 #endif
 	FLOAT       scalex,scaley,scalez;
+	FLOAT       spritexscale,spriteyscale;
 	FLOAT       fovxangle, fovyangle;
 	UINT8       splitscreen;
 	boolean     flip;            // screenflip
 	boolean     roll;
+	boolean     rollmodel;
+	SINT8       rollflip;
 	FLOAT       rollangle;
+	UINT8       rotaxis;
+	FLOAT       centerx, centery;
 #ifdef USE_FTRANSFORM_MIRROR
 	boolean     mirror;          // SRB2Kart: Encore Mode
 #endif

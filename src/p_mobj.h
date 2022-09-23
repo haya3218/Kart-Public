@@ -379,6 +379,7 @@ typedef struct mobj_s
 
 	boolean resetinterp; // if true, some fields should not be interpolated (see R_InterpolateMobjState implementation)
 	boolean colorized; // Whether the mobj uses the rainbow colormap
+	boolean rollmodel; // OpenGL: Should this model rotate?
 
 	// WARNING: New fields must be added separately to savegame and Lua.
 } mobj_t;

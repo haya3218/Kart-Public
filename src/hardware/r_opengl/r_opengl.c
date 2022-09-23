@@ -2956,6 +2956,19 @@ static void DrawModelEx(model_t *model, INT32 frameIndex, float duration, float 
 	pglRotatef(pos->anglex, -1.0f, 0.0f, 0.0f);
 	pglRotatef(pos->angley, 0.0f, -1.0f, 0.0f);
 
+	if (pos->roll && (pos->rollmodel == true))
+	{
+		float roll = (1.0f * pos->rollflip);
+		pglTranslatef(pos->centerx, pos->centery, 0);
+		if (pos->rotaxis == 2) // Z
+			pglRotatef(pos->rollangle, 0.0f, 0.0f, roll);
+		else if (pos->rotaxis == 1) // Y
+			pglRotatef(pos->rollangle, 0.0f, roll, 0.0f);
+		else // X
+			pglRotatef(pos->rollangle, roll, 0.0f, 0.0f);
+		pglTranslatef(-pos->centerx, -pos->centery, 0);
+	}
+
 	pglScalef(scalex, scaley, scalez);
 
 	useTinyFrames = model->meshes[0].tinyframes != NULL;

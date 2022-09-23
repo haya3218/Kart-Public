@@ -1140,6 +1140,8 @@ void HWR_DrawMD2(gr_vissprite_t *spr)
 		const UINT8 flip = (UINT8)((spr->mobj->eflags & MFE_VERTICALFLIP) == MFE_VERTICALFLIP);
 		spritedef_t *sprdef;
 		spriteframe_t *sprframe;
+		spriteinfo_t *sprinfo;
+		angle_t ang;
 		float finalscale;
 		interpmobjstate_t interp;
 
@@ -1172,9 +1174,13 @@ void HWR_DrawMD2(gr_vissprite_t *spr)
 		{
 			md2 = &md2_playermodels[(skin_t*)spr->mobj->skin-skins];
 			md2->skin = (skin_t*)spr->mobj->skin-skins;
+			sprinfo = &spriteinfo[spr->mobj->sprite];
 		}
-		else	// if we can't find the player md2, use SPR_PLAY's MD2.
+		else
+		{	// if we can't find the player md2, use SPR_PLAY's MD2.
 			md2 = &md2_models[spr->mobj->sprite];
+			sprinfo = &spriteinfo[spr->mobj->sprite];
+		}
 
 		if (md2->error)
 			return; // we already failed loading this before :(
@@ -1317,6 +1323,32 @@ void HWR_DrawMD2(gr_vissprite_t *spr)
 			const fixed_t anglef = AngleFixed((R_PointToAngle(interp.x, interp.y))-ANGLE_180);
 			p.angley = FIXED_TO_FLOAT(anglef);
 		}
+		p.rollangle = 0.0f;
+		p.rollflip = 1;
+		p.rotaxis = 0;
+		if (spr->mobj->rollangle)
+		{
+			fixed_t anglef = AngleFixed(spr->mobj->rollangle);
+			p.rollangle = FIXED_TO_FLOAT(anglef);
+			p.rollmodel = (spr->mobj->rollmodel);
+			p.roll = true;
+
+			// rotation pivot
+			p.centerx = FIXED_TO_FLOAT(spr->mobj->radius/2);
+			p.centery = FIXED_TO_FLOAT(spr->mobj->height/2);
+
+			// rotation axis
+			if (sprinfo->available)
+				p.rotaxis = (UINT8)(sprinfo->pivot[(spr->mobj->frame & FF_FRAMEMASK)].rotaxis);
+
+			// for NiGHTS specifically but should work everywhere else
+			ang = R_PointToAngle (spr->mobj->x, spr->mobj->y) - (spr->mobj->player ? spr->mobj->player->frameangle : spr->mobj->angle);
+			if ((sprframe->rotate & SRF_RIGHT) && (ang < ANGLE_180)) // See from right
+				p.rollflip = 1;
+			else if ((sprframe->rotate & SRF_LEFT) && (ang >= ANGLE_180)) // See from left
+				p.rollflip = -1;
+		}
+
 		p.anglex = 0.0f;
 #ifdef USE_FTRANSFORM_ANGLEZ
 		// Slope rotation from Kart

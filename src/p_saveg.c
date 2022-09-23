@@ -957,7 +957,8 @@ typedef enum
 	MD2_COLORIZED	= 1<<9,
 	MD2_WAYPOINTCAP	= 1<<10, 
 	MD2_SLOPE       = 1<<11,
-	MD2_ROLLANGLE   = 1<<12
+	MD2_ROLLANGLE   = 1<<12,
+	MD2_ROLLMODEL   = 1<<13
 } mobj_diff2_t;
 
 typedef enum
@@ -1152,6 +1153,8 @@ static void SaveMobjThinker(const thinker_t *th, const UINT8 type)
 		diff2 |= MD2_COLORIZED;
 	if (mobj->rollangle)
 		diff2 |= MD2_ROLLANGLE;
+	if (mobj->rollmodel)
+		diff2 |= MD2_ROLLMODEL;
 	if (mobj == waypointcap)
 		diff2 |= MD2_WAYPOINTCAP;
 	if (diff2 != 0)
@@ -1275,6 +1278,8 @@ static void SaveMobjThinker(const thinker_t *th, const UINT8 type)
 		WRITEUINT8(save_p, mobj->colorized);
 	if (diff2 & MD2_ROLLANGLE)
 		WRITEANGLE(save_p, mobj->rollangle);
+	if (diff2 & MD2_ROLLMODEL)
+		WRITEUINT8(save_p, mobj->rollmodel);
 
 	WRITEUINT32(save_p, mobj->mobjnum);
 }
@@ -2148,6 +2153,8 @@ static void LoadMobjThinker(actionf_p1 thinker)
 		mobj->colorized = READUINT8(save_p);
 	if (diff2 & MD2_ROLLANGLE)
 		mobj->rollangle = READANGLE(save_p);
+	if (diff2 & MD2_ROLLMODEL)
+		mobj->rollmodel = READUINT8(save_p);
 
 	if (diff & MD_REDFLAG)
 	{
